@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: video-editor-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+      - key: DATABASE_URL
+        fromDatabase:
+          name: video-editor-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+    healthCheckPath: /health
+
+  - type: worker
+    name: video-editor-bot-worker
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.6
+
+databases:
+  - name: video-editor-db
+    databaseName: video_editor
+    user: video_editor_user
+    plan: free
