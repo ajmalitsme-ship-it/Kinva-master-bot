@@ -1,0 +1,64 @@
+# ============================================
+# KINVA MASTER - LINTING WORKFLOW
+# ============================================
+
+name: Lint Code
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install linting tools
+      run: |
+        pip install flake8 black isort mypy pylint
+        
+    - name: Run Black (code formatter)
+      run: |
+        black --check src/ --line-length 100
+        
+    - name: Run isort (import sorter)
+      run: |
+        isort --check-only src/
+        
+    - name: Run Flake8 (style guide)
+      run: |
+        flake8 src/ --max-line-length=100 --ignore=E203,W503
+        
+    - name: Run Pylint (code analysis)
+      run: |
+        pylint src/ --fail-under=8.0
+        
+    - name: Run MyPy (type checking)
+      run: |
+        mypy src/ --ignore-missing-imports
+        
+    - name: Lint Summary
+      run: |
+        echo "✅ All linting checks passed!"
+        
+    - name: Notify on failure
+      if: failure()
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          ❌ Linting failed!
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Please fix code style issues.
