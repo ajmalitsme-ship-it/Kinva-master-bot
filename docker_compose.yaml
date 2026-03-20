@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: kinva-postgres
+    environment:
+      POSTGRES_DB: kinva_master
+      POSTGRES_USER: kinva_user
+      POSTGRES_PASSWORD: kinva_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - kinva-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: kinva-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - kinva-network
+
+  # Web App
+  web:
+    build: .
+    container_name: kinva-web
+    command: gunicorn src.app:app --bind 0.0.0.0:5000 --workers 4
+    environment:
+      - DATABASE_URL=postgresql://kinva_user:kinva_password@postgres:5432/kinva_master
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+    networks:
+      - kinva-network
+
+  # Telegram Bot Worker
+  bot:
+    build: .
+    container_name: kinva-bot
+    command: python src/bot.py
+    environment:
+      - DATABASE_URL=postgresql://kinva_user:kinva_password@postgres:5432/kinva_master
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+    networks:
+      - kinva-network
+
+  # Nginx (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: kinva-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/app/static
+    depends_on:
+      - web
+    networks:
+      - kinva-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  kinva-network:
+    driver: bridge
