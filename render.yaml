@@ -1,31 +1,42 @@
+# ============================================
+# KINVA MASTER - RENDER DEPLOYMENT CONFIG
+# ============================================
+
 services:
+  # Web App Service
   - type: web
-    name: video-editor-bot
+    name: kinva-master
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn src.app:app --bind 0.0.0.0:$PORT
+    plan: free
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.6
       - key: DATABASE_URL
         fromDatabase:
-          name: video-editor-db
+          name: kinva-master-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
+      - key: WEBAPP_URL
+        value: https://kinva-master.onrender.com
     healthCheckPath: /health
+    autoDeploy: true
 
+  # Telegram Bot Worker
   - type: worker
-    name: video-editor-bot-worker
+    name: kinva-master-bot
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
+    startCommand: python src/bot.py
+    plan: free
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.6
 
 databases:
-  - name: video-editor-db
-    databaseName: video_editor
-    user: video_editor_user
+  - name: kinva-master-db
+    databaseName: kinva_master
+    user: kinva_user
     plan: free
