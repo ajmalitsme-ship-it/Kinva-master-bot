@@ -1,0 +1,71 @@
+# ============================================
+# KINVA MASTER - SECURITY SCAN WORKFLOW
+# ============================================
+
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Run Bandit (Python security linter)
+      run: |
+        pip install bandit
+        bandit -r src/ -f json -o bandit-report.json
+        
+    - name: Run Safety (dependency checker)
+      run: |
+        pip install safety
+        safety check -r requirements.txt --json > safety-report.json
+        
+    - name: Run OWASP Dependency Check
+      uses: dependency-check/Dependency-Check_Action@main
+      with:
+        project: 'Kinva Master'
+        path: '.'
+        format: 'HTML'
+        out: 'reports'
+        
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+          reports/
+          
+    - name: Notify on vulnerabilities
+      if: failure()
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        message: |
+          🔒 Security vulnerabilities found!
+          Repository: ${{ github.repository }}
+          Please check the security reports.
