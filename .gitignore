@@ -1,20 +1,27 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
-env/
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
 venv/
+env/
 ENV/
-env.bak/
-venv.bak/
-pythonenv*
+.venv/
+.env/
+.env.local
+.env.production
 
 # Database
 *.db
 *.sqlite
 *.sqlite3
+*.db-journal
 
 # Uploads
 uploads/
@@ -33,16 +40,14 @@ thumbnails/
 *.gif
 *.bmp
 *.webp
+*.svg
 
 # Logs
 logs/
 *.log
-
-# Environment
-.env
-.env.local
-.env.production
-.env.development
+*.log.*
+access.log
+error.log
 
 # IDE
 .vscode/
@@ -50,36 +55,54 @@ logs/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
 Thumbs.db
-desktop.ini
+*.suo
+*.user
 
 # Testing
+.pytest_cache/
 .coverage
 htmlcov/
-.pytest_cache/
 .tox/
-.coverage.*
 *.cover
 *.py,cover
 
-# Distribution
-dist/
-build/
-*.egg-info/
+# Deployment
+*.pid
+*.seed
+*.pid.lock
+.cache/
+.envrc
 
-# Render specific
-render.yaml
-Procfile
-runtime.txt
+# Secrets
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
 
 # Node (if any)
 node_modules/
+npm-debug.log
+yarn-error.log
 package-lock.json
-yarn.lock
 
-# Cache
-.cache/
-*.cache
+# Docker
+.dockerignore
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*.swp
+*.swo
