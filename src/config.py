@@ -19,11 +19,11 @@ class Config:
     # TELEGRAM API CREDENTIALS
     # ============================================
     # Get from https://my.telegram.org
-    API_ID = int(os.getenv('API_ID', '0'))
-    API_HASH = os.getenv('API_HASH', '')
+    API_ID = int(os.getenv('API_ID', '27806628'))
+    API_HASH = os.getenv('API_HASH', '25d88301e886b82826a525b7cf52e090')
     
     # Get from @BotFather
-    BOT_TOKEN = os.getenv('BOT_TOKEN', '')
+    BOT_TOKEN = os.getenv('BOT_TOKEN', '8776043562:AAHLiV5VKyUXvhscNJ6FZZ2YLlqYiag_tHc')
     BOT_USERNAME = os.getenv('BOT_USERNAME', '@kinva_master_bot')
     BOT_NAME = os.getenv('BOT_NAME', 'Kinva Master')
     
@@ -37,7 +37,7 @@ class Config:
     # ============================================
     # ADMIN CONFIGURATION
     # ============================================
-    ADMIN_IDS = [int(id) for id in os.getenv('ADMIN_IDS', '').split(',') if id]
+    ADMIN_IDS = [int(id) for id in os.getenv('ADMIN_IDS', '8525952693').split(',') if id]
     ADMIN_CONTACT = os.getenv('ADMIN_CONTACT', '@kinva_master')
     ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'admin@kinva-master.com')
     ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'kinva_master')
