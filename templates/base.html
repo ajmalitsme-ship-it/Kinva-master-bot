@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Kinva Master - Complete Video & Image Editing Platform. Create stunning videos, images, and designs with professional tools.">
+    <meta name="keywords" content="video editor, image editor, design, canva, kinemaster, photo editing">
+    <meta name="author" content="Kinva Master">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ config.WEBAPP_URL }}">
+    <meta property="og:title" content="Kinva Master - Video & Image Editing Platform">
+    <meta property="og:description" content="Create stunning videos and designs with our professional tools">
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.jpg') }}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ config.WEBAPP_URL }}">
+    <meta property="twitter:title" content="Kinva Master - Video & Image Editing Platform">
+    <meta property="twitter:description" content="Create stunning videos and designs with our professional tools">
+    <meta property="twitter:image" content="{{ url_for('static', filename='images/twitter-card.jpg') }}">
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    
+    <!-- Theme CSS -->
+    <link id="theme-css" rel="stylesheet" href="{{ url_for('static', filename='css/themes/light.css') }}">
+    
+    <title>{% block title %}Kinva Master - Video & Image Editing Platform{% endblock %}</title>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}" data-theme="light">
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Navbar -->
+    {% include 'components/navbar.html' %}
+    
+    <!-- Sidebar (if logged in) -->
+    {% if session.get('user_id') %}
+        {% include 'components/sidebar.html' %}
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="main-content {% if session.get('user_id') %}with-sidebar{% endif %}" id="main-content">
+        <!-- Page Header -->
+        {% block header %}{% endblock %}
+        
+        <!-- Alerts -->
+        {% include 'components/alerts.html' %}
+        
+        <!-- Breadcrumb -->
+        {% block breadcrumb %}{% endblock %}
+        
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    {% include 'components/footer.html' %}
+    
+    <!-- Modals -->
+    {% include 'components/modals.html' %}
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Core JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+    
+    <!-- Page Specific JS -->
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Initialize App -->
+    <script>
+        $(document).ready(function() {
+            // Initialize main app
+            if (typeof App !== 'undefined') {
+                App.init({
+                    userId: '{{ session.get("user_id") }}',
+                    isPremium: {{ 'true' if session.get('is_premium') else 'false' }},
+                    theme: localStorage.getItem('theme') || 'light',
+                    wsUrl: '{{ config.WS_URL }}',
+                    apiUrl: '{{ config.API_URL }}'
+                });
+            }
+            
+            // Load theme
+            const theme = localStorage.getItem('theme') || 'light';
+            const themeLink = document.getElementById('theme-css');
+            if (themeLink) {
+                themeLink.href = `/static/css/themes/${theme}.css`;
+                document.body.setAttribute('data-theme', theme);
+            }
+            
+            // Check for maintenance mode
+            {% if config.MAINTENANCE_MODE %}
+                if (typeof App !== 'undefined') {
+                    App.showMaintenance('{{ config.MAINTENANCE_MESSAGE }}');
+                }
+            {% endif %}
+        });
+    </script>
+</body>
+      </html>
