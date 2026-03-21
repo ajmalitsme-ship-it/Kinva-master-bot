@@ -1,0 +1,63 @@
+<!-- Button Components -->
+<button class="btn btn-primary">Primary Button</button>
+<button class="btn btn-secondary">Secondary Button</button>
+<button class="btn btn-outline">Outline Button</button>
+<button class="btn btn-danger">Danger Button</button>
+<button class="btn btn-success">Success Button</button>
+<button class="btn btn-warning">Warning Button</button>
+<button class="btn btn-info">Info Button</button>
+<button class="btn btn-light">Light Button</button>
+<button class="btn btn-dark">Dark Button</button>
+<button class="btn btn-link">Link Button</button>
+
+<!-- Button Sizes -->
+<button class="btn btn-primary btn-sm">Small</button>
+<button class="btn btn-primary btn-md">Medium</button>
+<button class="btn btn-primary btn-lg">Large</button>
+
+<!-- Button with Icon -->
+<button class="btn btn-primary">
+    <i class="fas fa-download"></i> Download
+</button>
+
+<!-- Loading Button -->
+<button class="btn btn-primary btn-loading" disabled>
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+</button>
+
+<!-- Block Button -->
+<button class="btn btn-primary btn-block">Block Button</button>
+
+<style>
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-md { padding: 10px 20px; font-size: 14px; }
+    .btn-lg { padding: 14px 28px; font-size: 16px; }
+    .btn-block { width: 100%; display: flex; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-outline { background: transparent; border: 2px solid #667eea; color: #667eea; }
+    .btn-outline:hover { background: #667eea; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-warning { background: #ffc107; color: #333; }
+    .btn-info { background: #17a2b8; color: white; }
+    .btn-light { background: #f8f9fa; color: #333; }
+    .btn-dark { background: #343a40; color: white; }
+    .btn-link { background: none; color: #667eea; text-decoration: underline; }
+    .btn:disabled, .btn-loading { opacity: 0.6; cursor: not-allowed; transform: none; }
+                </style>
