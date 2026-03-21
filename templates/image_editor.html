@@ -1,0 +1,1073 @@
+{% extends "base.html" %}
+
+{% block title %}Image Editor - Kinva Master{% endblock %}
+
+{% block body_class %}image-editor-page{% endblock %}
+
+{% block content %}
+<div class="image-editor">
+    <!-- Top Toolbar -->
+    <div class="editor-toolbar">
+        <div class="toolbar-left">
+            <button class="btn-icon" onclick="openImage()">
+                <i class="fas fa-folder-open"></i>
+            </button>
+            <button class="btn-icon" onclick="saveImage()">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="btn-icon" onclick="exportImage()">
+                <i class="fas fa-download"></i>
+            </button>
+            <div class="divider"></div>
+            <button class="btn-icon" onclick="undo()">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button class="btn-icon" onclick="redo()">
+                <i class="fas fa-redo"></i>
+            </button>
+            <div class="divider"></div>
+            <button class="btn-icon" onclick="zoomIn()">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button class="btn-icon" onclick="zoomOut()">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <button class="btn-icon" onclick="fitToScreen()">
+                <i class="fas fa-expand"></i>
+            </button>
+        </div>
+
+        <div class="toolbar-center">
+            <div class="image-info">
+                <span id="imageDimensions">0 x 0</span>
+                <span id="imageSize">0 KB</span>
+            </div>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="btn-premium" onclick="showPremiumModal()">
+                <i class="fas fa-crown"></i> Upgrade
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div class="editor-main">
+        <!-- Left Panel - Tools -->
+        <div class="tools-panel">
+            <div class="tools-tabs">
+                <button class="tab-btn active" data-tab="adjust">Adjust</button>
+                <button class="tab-btn" data-tab="filters">Filters</button>
+                <button class="tab-btn" data-tab="effects">Effects</button>
+                <button class="tab-btn" data-tab="text">Text</button>
+                <button class="tab-btn" data-tab="crop">Crop</button>
+            </div>
+
+            <!-- Adjust Tab -->
+            <div class="tools-content active" id="adjust-tab">
+                <div class="adjust-controls">
+                    <div class="control-group">
+                        <label>Brightness</label>
+                        <input type="range" id="brightness" min="-100" max="100" value="0" oninput="applyAdjustment('brightness', this.value)">
+                        <span id="brightnessValue">0</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Contrast</label>
+                        <input type="range" id="contrast" min="-100" max="100" value="0" oninput="applyAdjustment('contrast', this.value)">
+                        <span id="contrastValue">0</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Saturation</label>
+                        <input type="range" id="saturation" min="-100" max="100" value="0" oninput="applyAdjustment('saturation', this.value)">
+                        <span id="saturationValue">0</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Sharpness</label>
+                        <input type="range" id="sharpness" min="0" max="200" value="100" oninput="applyAdjustment('sharpness', this.value)">
+                        <span id="sharpnessValue">100</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Exposure</label>
+                        <input type="range" id="exposure" min="-100" max="100" value="0" oninput="applyAdjustment('exposure', this.value)">
+                        <span id="exposureValue">0</span>
+                    </div>
+                    <div class="control-group">
+                        <label>Temperature</label>
+                        <input type="range" id="temperature" min="-100" max="100" value="0" oninput="applyAdjustment('temperature', this.value)">
+                        <span id="temperatureValue">0</span>
+                    </div>
+                </div>
+                <button class="btn-reset" onclick="resetAdjustments()">Reset All</button>
+            </div>
+
+            <!-- Filters Tab -->
+            <div class="tools-content" id="filters-tab">
+                <div class="filters-grid">
+                    <div class="filter-item" onclick="applyFilter('grayscale')">
+                        <div class="filter-preview">⚫</div>
+                        <span>Grayscale</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('sepia')">
+                        <div class="filter-preview">🟫</div>
+                        <span>Sepia</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('invert')">
+                        <div class="filter-preview">🔄</div>
+                        <span>Invert</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('vintage')">
+                        <div class="filter-preview">🎞️</div>
+                        <span>Vintage</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('cinematic')">
+                        <div class="filter-preview">🎬</div>
+                        <span>Cinematic</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('glitch')">
+                        <div class="filter-preview">💥</div>
+                        <span>Glitch</span>
+                    </div>
+                    <div class="filter-item premium" onclick="applyFilter('neon')">
+                        <div class="filter-preview">🔥</div>
+                        <span>Neon</span>
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                    <div class="filter-item premium" onclick="applyFilter('oil_paint')">
+                        <div class="filter-preview">🎨</div>
+                        <span>Oil Paint</span>
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('blur')">
+                        <div class="filter-preview">🌀</div>
+                        <span>Blur</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('sharpen')">
+                        <div class="filter-preview">✨</div>
+                        <span>Sharpen</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('edge')">
+                        <div class="filter-preview">✏️</div>
+                        <span>Edge</span>
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('emboss')">
+                        <div class="filter-preview">⛰️</div>
+                        <span>Emboss</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Effects Tab -->
+            <div class="tools-content" id="effects-tab">
+                <div class="effects-list">
+                    <div class="effect-group">
+                        <h4>Vignette</h4>
+                        <input type="range" id="vignette" min="0" max="100" value="0" oninput="applyEffect('vignette', this.value)">
+                    </div>
+                    <div class="effect-group premium">
+                        <h4>Pixelate</h4>
+                        <input type="range" id="pixelate" min="0" max="50" value="0" oninput="applyEffect('pixelate', this.value)">
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                    <div class="effect-group premium">
+                        <h4>Mosaic</h4>
+                        <input type="range" id="mosaic" min="0" max="50" value="0" oninput="applyEffect('mosaic', this.value)">
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                    <div class="effect-group">
+                        <h4>Grain</h4>
+                        <input type="range" id="grain" min="0" max="100" value="0" oninput="applyEffect('grain', this.value)">
+                    </div>
+                    <div class="effect-group">
+                        <h4>Glow</h4>
+                        <input type="range" id="glow" min="0" max="100" value="0" oninput="applyEffect('glow', this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Tab -->
+            <div class="tools-content" id="text-tab">
+                <div class="text-controls">
+                    <div class="control-group">
+                        <label>Text</label>
+                        <input type="text" id="textInput" placeholder="Enter your text">
+                    </div>
+                    <div class="control-group">
+                        <label>Font Family</label>
+                        <select id="fontFamily">
+                            <option value="Arial">Arial</option>
+                            <option value="Roboto">Roboto</option>
+                            <option value="Open Sans">Open Sans</option>
+                            <option value="Poppins">Poppins</option>
+                            <option value="Montserrat">Montserrat</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Font Size</label>
+                        <input type="number" id="fontSize" value="24" min="12" max="72">
+                    </div>
+                    <div class="control-group">
+                        <label>Color</label>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                    <div class="control-group">
+                        <label>Background Color</label>
+                        <input type="color" id="textBgColor" value="#000000">
+                    </div>
+                    <div class="control-group">
+                        <label>Opacity</label>
+                        <input type="range" id="textOpacity" min="0" max="100" value="100">
+                    </div>
+                    <button class="btn-add-text" onclick="addText()">Add Text</button>
+                </div>
+            </div>
+
+            <!-- Crop Tab -->
+            <div class="tools-content" id="crop-tab">
+                <div class="crop-controls">
+                    <div class="crop-presets">
+                        <h4>Presets</h4>
+                        <div class="preset-buttons">
+                            <button onclick="setCropPreset('square')">Square (1:1)</button>
+                            <button onclick="setCropPreset('landscape')">Landscape (16:9)</button>
+                            <button onclick="setCropPreset('portrait')">Portrait (9:16)</button>
+                            <button onclick="setCropPreset('instagram')">Instagram (1:1)</button>
+                            <button onclick="setCropPreset('facebook')">Facebook (1.91:1)</button>
+                            <button onclick="setCropPreset('youtube')">YouTube (16:9)</button>
+                        </div>
+                    </div>
+                    <div class="crop-manual">
+                        <h4>Manual Crop</h4>
+                        <div class="crop-inputs">
+                            <div>
+                                <label>X</label>
+                                <input type="number" id="cropX" value="0">
+                            </div>
+                            <div>
+                                <label>Y</label>
+                                <input type="number" id="cropY" value="0">
+                            </div>
+                            <div>
+                                <label>Width</label>
+                                <input type="number" id="cropWidth" value="100">
+                            </div>
+                            <div>
+                                <label>Height</label>
+                                <input type="number" id="cropHeight" value="100">
+                            </div>
+                        </div>
+                        <button class="btn-crop" onclick="applyCrop()">Apply Crop</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center - Canvas Area -->
+        <div class="canvas-area">
+            <div class="canvas-container" id="canvasContainer">
+                <canvas id="imageCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Right Panel - History -->
+        <div class="history-panel">
+            <h3>History</h3>
+            <div class="history-list" id="historyList">
+                <div class="history-item">Original Image</div>
+            </div>
+            <button class="btn-clear" onclick="clearHistory()">Clear History</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .image-editor {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        background: #1a1a2e;
+    }
+    
+    .editor-toolbar {
+        background: #2d3748;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .btn-icon {
+        background: none;
+        border: none;
+        color: #a0aec0;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.3s;
+    }
+    
+    .btn-icon:hover {
+        background: #4a5568;
+        color: white;
+    }
+    
+    .divider {
+        width: 1px;
+        height: 30px;
+        background: #4a5568;
+        margin: 0 10px;
+    }
+    
+    .image-info {
+        color: #a0aec0;
+        font-size: 12px;
+    }
+    
+    .image-info span {
+        margin: 0 10px;
+    }
+    
+    .btn-premium {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    
+    .editor-main {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+    
+    .tools-panel {
+        width: 280px;
+        background: #2d3748;
+        border-right: 1px solid #4a5568;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .tools-tabs {
+        display: flex;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .tools-tabs .tab-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 12px;
+        color: #a0aec0;
+        cursor: pointer;
+    }
+    
+    .tools-tabs .tab-btn.active {
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .tools-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        display: none;
+    }
+    
+    .tools-content.active {
+        display: block;
+    }
+    
+    .control-group {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .control-group label {
+        width: 80px;
+        color: #a0aec0;
+        font-size: 12px;
+    }
+    
+    .control-group input {
+        flex: 1;
+        height: 4px;
+        -webkit-appearance: none;
+        background: #4a5568;
+        border-radius: 2px;
+    }
+    
+    .control-group input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #667eea;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .control-group span {
+        width: 40px;
+        color: #a0aec0;
+        font-size: 12px;
+        text-align: right;
+    }
+    
+    .btn-reset {
+        width: 100%;
+        background: #4a5568;
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .filter-item {
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.3s;
+    }
+    
+    .filter-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .filter-preview {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+    
+    .filter-item span {
+        display: block;
+        color: white;
+        font-size: 12px;
+    }
+    
+    .premium-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: gold;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 4px;
+        font-size: 8px;
+    }
+    
+    .effects-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .effect-group {
+        position: relative;
+    }
+    
+    .effect-group h4 {
+        color: #a0aec0;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .effect-group input {
+        width: 100%;
+    }
+    
+    .text-controls .control-group {
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .text-controls .control-group label {
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    .text-controls input, .text-controls select {
+        width: 100%;
+        padding: 8px;
+        background: #1a1a2e;
+        border: 1px solid #4a5568;
+        color: white;
+        border-radius: 4px;
+    }
+    
+    .btn-add-text {
+        width: 100%;
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    .crop-presets {
+        margin-bottom: 20px;
+    }
+    
+    .crop-presets h4 {
+        color: #a0aec0;
+        margin-bottom: 10px;
+    }
+    
+    .preset-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    
+    .preset-buttons button {
+        background: #1a1a2e;
+        border: 1px solid #4a5568;
+        color: #a0aec0;
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 10px;
+    }
+    
+    .crop-manual h4 {
+        color: #a0aec0;
+        margin-bottom: 10px;
+    }
+    
+    .crop-inputs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .crop-inputs div {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .crop-inputs label {
+        color: #a0aec0;
+        font-size: 10px;
+        margin-bottom: 4px;
+    }
+    
+    .crop-inputs input {
+        padding: 6px;
+        background: #1a1a2e;
+        border: 1px solid #4a5568;
+        color: white;
+        border-radius: 4px;
+    }
+    
+    .btn-crop {
+        width: 100%;
+        background: #667eea;
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    
+    .canvas-area {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #1a1a2e;
+        overflow: auto;
+    }
+    
+    .canvas-container {
+        background: #2d3748;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        display: inline-block;
+    }
+    
+    #imageCanvas {
+        display: block;
+        max-width: 100%;
+        max-height: calc(100vh - 120px);
+    }
+    
+    .history-panel {
+        width: 200px;
+        background: #2d3748;
+        border-left: 1px solid #4a5568;
+        padding: 15px;
+    }
+    
+    .history-panel h3 {
+        color: white;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    
+    .history-list {
+        max-height: calc(100vh - 150px);
+        overflow-y: auto;
+    }
+    
+    .history-item {
+        background: #1a1a2e;
+        color: #a0aec0;
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    
+    .history-item:hover {
+        background: #4a5568;
+    }
+    
+    .btn-clear {
+        width: 100%;
+        background: #dc3545;
+        border: none;
+        color: white;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    @media (max-width: 1024px) {
+        .tools-panel, .history-panel {
+            width: 240px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let canvas = null;
+    let ctx = null;
+    let originalImage = null;
+    let currentImage = null;
+    let history = [];
+    let historyIndex = -1;
+    
+    $(document).ready(function() {
+        initImageEditor();
+        loadDefaultImage();
+    });
+    
+    function initImageEditor() {
+        canvas = document.getElementById('imageCanvas');
+        ctx = canvas.getContext('2d');
+        
+        // Tab switching
+        $('.tools-tabs .tab-btn').click(function() {
+            $('.tools-tabs .tab-btn').removeClass('active');
+            $(this).addClass('active');
+            $('.tools-content').removeClass('active');
+            $('#' + $(this).data('tab') + '-tab').addClass('active');
+        });
+    }
+    
+    function loadDefaultImage() {
+        // Create a default image
+        canvas.width = 800;
+        canvas.height = 600;
+        ctx.fillStyle = '#2d3748';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#667eea';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Click to upload image', canvas.width/2, canvas.height/2);
+        
+        document.getElementById('imageDimensions').textContent = `${canvas.width} x ${canvas.height}`;
+        document.getElementById('imageSize').textContent = '0 KB';
+        
+        saveToHistory();
+    }
+    
+    function openImage() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    originalImage = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    currentImage = originalImage;
+                    
+                    document.getElementById('imageDimensions').textContent = `${canvas.width} x ${canvas.height}`;
+                    document.getElementById('imageSize').textContent = `${(file.size / 1024).toFixed(1)} KB`;
+                    
+                    saveToHistory();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    }
+    
+    function applyAdjustment(adjustment, value) {
+        if (!currentImage) return;
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        for (let i = 0; i < data.length; i += 4) {
+            let r = data[i];
+            let g = data[i+1];
+            let b = data[i+2];
+            
+            if (adjustment === 'brightness') {
+                r += value;
+                g += value;
+                b += value;
+            } else if (adjustment === 'contrast') {
+                const factor = (259 * (value + 255)) / (255 * (259 - value));
+                r = factor * (r - 128) + 128;
+                g = factor * (g - 128) + 128;
+                b = factor * (b - 128) + 128;
+            } else if (adjustment === 'saturation') {
+                const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+                r = gray + (r - gray) * (value / 100 + 1);
+                g = gray + (g - gray) * (value / 100 + 1);
+                b = gray + (b - gray) * (value / 100 + 1);
+            } else if (adjustment === 'exposure') {
+                const exposure = Math.pow(2, value / 100);
+                r *= exposure;
+                g *= exposure;
+                b *= exposure;
+            } else if (adjustment === 'temperature') {
+                r += value;
+                b -= value;
+            }
+            
+            data[i] = Math.min(255, Math.max(0, r));
+            data[i+1] = Math.min(255, Math.max(0, g));
+            data[i+2] = Math.min(255, Math.max(0, b));
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        
+        // Update display values
+        $(`#${adjustment}Value`).text(value);
+    }
+    
+    function resetAdjustments() {
+        if (originalImage) {
+            ctx.putImageData(originalImage, 0, 0);
+            currentImage = originalImage;
+            
+            // Reset sliders
+            $('#brightness').val(0);
+            $('#contrast').val(0);
+            $('#saturation').val(0);
+            $('#sharpness').val(100);
+            $('#exposure').val(0);
+            $('#temperature').val(0);
+        }
+    }
+    
+    function applyFilter(filter) {
+        if (!currentImage) return;
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        if (filter === 'grayscale') {
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = 0.2989 * data[i] + 0.5870 * data[i+1] + 0.1140 * data[i+2];
+                data[i] = gray;
+                data[i+1] = gray;
+                data[i+2] = gray;
+            }
+        } else if (filter === 'sepia') {
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i+1];
+                const b = data[i+2];
+                data[i] = Math.min(255, r * 0.393 + g * 0.769 + b * 0.189);
+                data[i+1] = Math.min(255, r * 0.349 + g * 0.686 + b * 0.168);
+                data[i+2] = Math.min(255, r * 0.272 + g * 0.534 + b * 0.131);
+            }
+        } else if (filter === 'invert') {
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];
+                data[i+1] = 255 - data[i+1];
+                data[i+2] = 255 - data[i+2];
+            }
+        } else if (filter === 'blur') {
+            // Simple box blur
+            const width = canvas.width;
+            const height = canvas.height;
+            const tempData = new Uint8ClampedArray(data);
+            
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    let idx = (y * width + x) * 4;
+                    let sumR = 0, sumG = 0, sumB = 0;
+                    
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const tidx = ((y + dy) * width + (x + dx)) * 4;
+                            sumR += tempData[tidx];
+                            sumG += tempData[tidx+1];
+                            sumB += tempData[tidx+2];
+                        }
+                    }
+                    
+                    data[idx] = sumR / 9;
+                    data[idx+1] = sumG / 9;
+                    data[idx+2] = sumB / 9;
+                }
+            }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        saveToHistory();
+    }
+    
+    function applyEffect(effect, value) {
+        if (!currentImage) return;
+        
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        if (effect === 'vignette') {
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const radius = Math.sqrt(dx * dx + dy * dy);
+                    const factor = 1 - (radius / maxRadius) * (value / 100);
+                    
+                    const idx = (y * width + x) * 4;
+                    data[idx] *= factor;
+                    data[idx+1] *= factor;
+                    data[idx+2] *= factor;
+                }
+            }
+        } else if (effect === 'grain') {
+            const intensity = value / 100;
+            for (let i = 0; i < data.length; i += 4) {
+                const grain = (Math.random() - 0.5) * intensity * 50;
+                data[i] = Math.min(255, Math.max(0, data[i] + grain));
+                data[i+1] = Math.min(255, Math.max(0, data[i+1] + grain));
+                data[i+2] = Math.min(255, Math.max(0, data[i+2] + grain));
+            }
+        } else if (effect === 'glow') {
+            // Simple glow effect
+            const intensity = value / 100;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, data[i] + intensity * 50);
+                data[i+1] = Math.min(255, data[i+1] + intensity * 50);
+                data[i+2] = Math.min(255, data[i+2] + intensity * 50);
+            }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+        saveToHistory();
+    }
+    
+    function addText() {
+        const text = $('#textInput').val();
+        if (!text) return;
+        
+        const fontSize = parseInt($('#fontSize').val());
+        const fontFamily = $('#fontFamily').val();
+        const color = $('#textColor').val();
+        const bgColor = $('#textBgColor').val();
+        const opacity = $('#textOpacity').val() / 100;
+        
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.fillStyle = color;
+        ctx.shadowBlur = 0;
+        
+        const metrics = ctx.measureText(text);
+        const textWidth = metrics.width;
+        const textHeight = fontSize;
+        
+        const x = (canvas.width - textWidth) / 2;
+        const y = (canvas.height + textHeight) / 2;
+        
+        if (bgColor !== '#000000') {
+            ctx.fillStyle = bgColor;
+            ctx.globalAlpha = opacity;
+            ctx.fillRect(x - 5, y - textHeight, textWidth + 10, textHeight + 5);
+            ctx.globalAlpha = 1;
+        }
+        
+        ctx.fillStyle = color;
+        ctx.fillText(text, x, y);
+        
+        saveToHistory();
+    }
+    
+    function setCropPreset(preset) {
+        let ratio;
+        switch(preset) {
+            case 'square':
+                ratio = 1;
+                break;
+            case 'landscape':
+                ratio = 16/9;
+                break;
+            case 'portrait':
+                ratio = 9/16;
+                break;
+            default:
+                ratio = 1;
+        }
+        
+        let width = canvas.width;
+        let height = canvas.height;
+        
+        if (width / height > ratio) {
+            width = height * ratio;
+        } else {
+            height = width / ratio;
+        }
+        
+        document.getElementById('cropWidth').value = width;
+        document.getElementById('cropHeight').value = height;
+        document.getElementById('cropX').value = (canvas.width - width) / 2;
+        document.getElementById('cropY').value = (canvas.height - height) / 2;
+    }
+    
+    function applyCrop() {
+        const x = parseInt($('#cropX').val());
+        const y = parseInt($('#cropY').val());
+        const width = parseInt($('#cropWidth').val());
+        const height = parseInt($('#cropHeight').val());
+        
+        const imageData = ctx.getImageData(x, y, width, height);
+        canvas.width = width;
+        canvas.height = height;
+        ctx.putImageData(imageData, 0, 0);
+        
+        document.getElementById('imageDimensions').textContent = `${canvas.width} x ${canvas.height}`;
+        saveToHistory();
+    }
+    
+    function saveToHistory() {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Remove forward history
+        history = history.slice(0, historyIndex + 1);
+        history.push(imageData);
+        historyIndex++;
+        
+        updateHistoryList();
+    }
+    
+    function updateHistoryList() {
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+        
+        history.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.textContent = index === 0 ? 'Original Image' : `Edit ${index}`;
+            if (index === historyIndex) {
+                div.style.background = '#4a5568';
+            }
+            div.onclick = () => restoreHistory(index);
+            historyList.appendChild(div);
+        });
+    }
+    
+    function restoreHistory(index) {
+        if (index >= 0 && index < history.length) {
+            ctx.putImageData(history[index], 0, 0);
+            historyIndex = index;
+            updateHistoryList();
+        }
+    }
+    
+    function clearHistory() {
+        history = [history[historyIndex]];
+        historyIndex = 0;
+        updateHistoryList();
+    }
+    
+    function undo() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            ctx.putImageData(history[historyIndex], 0, 0);
+            updateHistoryList();
+        }
+    }
+    
+    function redo() {
+        if (historyIndex < history.length - 1) {
+            historyIndex++;
+            ctx.putImageData(history[historyIndex], 0, 0);
+            updateHistoryList();
+        }
+    }
+    
+    function zoomIn() {
+        const container = document.getElementById('canvasContainer');
+        const currentScale = parseFloat(container.style.transform?.replace('scale(', '') || 1);
+        container.style.transform = `scale(${currentScale + 0.1})`;
+    }
+    
+    function zoomOut() {
+        const container = document.getElementById('canvasContainer');
+        const currentScale = parseFloat(container.style.transform?.replace('scale(', '') || 1);
+        container.style.transform = `scale(${Math.max(0.5, currentScale - 0.1)})`;
+    }
+    
+    function fitToScreen() {
+        const container = document.getElementById('canvasContainer');
+        container.style.transform = 'scale(1)';
+    }
+    
+    function saveImage() {
+        alert('Save image feature coming soon');
+    }
+    
+    function exportImage() {
+        const link = document.createElement('a');
+        link.download = 'edited-image.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+    
+    function showPremiumModal() {
+        $('#premiumModal').addClass('active');
+    }
+</script>
+{% endblock %}
