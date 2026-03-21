@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Kinva Master</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px 12px 0 0;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .header h1 {
+            color: white;
+            margin: 15px 0 0;
+            font-size: 28px;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .success-icon {
+            text-align: center;
+            font-size: 64px;
+            color: #28a745;
+            margin: 20px 0;
+        }
+        .invoice-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .invoice-details {
+            margin-top: 15px;
+        }
+        .invoice-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .total-row {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #e0e0e0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #999;
+            border-top: 1px solid #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/logo-white.svg', _external=True) }}" alt="Kinva Master">
+            <h1>Payment Successful! 🎉</h1>
+        </div>
+        
+        <div class="content">
+            <div class="success-icon">
+                ✅
+            </div>
+            
+            <p>Hi {{ user.first_name or user.username }},</p>
+            <p>Thank you for upgrading to <strong>{{ plan }} Premium</strong>! Your payment has been successfully processed and your account is now upgraded.</p>
+            
+            <div class="invoice-box">
+                <h3>Invoice Summary</h3>
+                <div class="invoice-details">
+                    <div class="invoice-row">
+                        <span>Plan:</span>
+                        <span>{{ plan }} Premium</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span>Billing Period:</span>
+                        <span>{{ billing_period }}</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span>Payment Method:</span>
+                        <span>{{ payment_method }}</span>
+                    </div>
+                    <div class="invoice-row">
+                        <span>Transaction ID:</span>
+                        <span>{{ transaction_id }}</span>
+                    </div>
+                    <div class="invoice-row total-row">
+                        <span>Total:</span>
+                        <span>${{ amount }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <p>Your premium benefits are now active:</p>
+            <ul>
+                <li>✅ 4K video export</li>
+                <li>✅ No watermark on exports</li>
+                <li>✅ All 30+ image filters</li>
+                <li>✅ Unlimited exports</li>
+                <li>✅ Priority support</li>
+                <li>✅ 10GB cloud storage</li>
+            </ul>
+            
+            <div style="text-align: center;">
+                <a href="{{ config.WEBAPP_URL }}/dashboard" class="btn">Start Creating</a>
+            </div>
+            
+            <p>Your invoice is attached to this email. You can also view your billing history in your <a href="{{ config.WEBAPP_URL }}/settings/billing">account settings</a>.</p>
+            
+            <p>Need help getting started? Check out our <a href="{{ config.WEBAPP_URL }}/help">help center</a> or contact our support team.</p>
+            
+            <p>Thank you for being a valued Kinva Master user!<br>The Kinva Master Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {{ current_year }} Kinva Master. All rights reserved.</p>
+            <p>This is a transactional email. Please keep it for your records.</p>
+        </div>
+    </div>
+</body>
+</html>
