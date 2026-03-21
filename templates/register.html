@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Kinva Master{% endblock %}
+
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Create Account</h2>
+            <p>Join Kinva Master and start creating</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" id="first_name" name="first_name" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" id="last_name" name="last_name" placeholder="Doe">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username *</label>
+                <input type="text" id="username" name="username" placeholder="johndoe" required>
+                <small class="form-hint">3-30 characters, letters and numbers only</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" placeholder="john@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <div class="password-input">
+                    <input type="password" id="password" name="password" placeholder="Create a password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-bar"></div>
+                    <span class="strength-text"></span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password *</label>
+                <div class="password-input">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('confirm_password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="terms" required>
+                    <span>I agree to the <a href="{{ url_for('web.terms') }}" target="_blank">Terms of Service</a> and <a href="{{ url_for('web.privacy') }}" target="_blank">Privacy Policy</a></span>
+                </label>
+            </div>
+            
+            <div class="recaptcha-container">
+                <div id="recaptcha"></div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('web.login') }}">Sign in</a></p>
+        </div>
+
+        <div class="auth-divider">
+            <span>Or sign up with</span>
+        </div>
+
+        <div class="social-login">
+            <button class="social-btn google" onclick="registerWithGoogle()">
+                <i class="fab fa-google"></i>
+                Google
+            </button>
+            <button class="social-btn telegram" onclick="registerWithTelegram()">
+                <i class="fab fa-telegram"></i>
+                Telegram
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+    }
+    
+    .auth-container {
+        width: 100%;
+        max-width: 480px;
+    }
+    
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .auth-header h2 {
+        font-size: 28px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .auth-header p {
+        color: #666;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+    }
+    
+    .form-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .form-group input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+    
+    .form-hint {
+        display: block;
+        font-size: 11px;
+        color: #999;
+        margin-top: 5px;
+    }
+    
+    .password-input {
+        position: relative;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #999;
+    }
+    
+    .password-strength {
+        margin-top: 8px;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    
+    .strength-bar::before {
+        content: '';
+        display: block;
+        height: 100%;
+        width: 0%;
+        transition: width 0.3s;
+    }
+    
+    .strength-bar.weak::before {
+        width: 33%;
+        background: #dc3545;
+    }
+    
+    .strength-bar.medium::before {
+        width: 66%;
+        background: #ffc107;
+    }
+    
+    .strength-bar.strong::before {
+        width: 100%;
+        background: #28a745;
+    }
+    
+    .strength-text {
+        font-size: 11px;
+        color: #666;
+        margin-top: 4px;
+        display: inline-block;
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #666;
+        line-height: 1.4;
+    }
+    
+    .checkbox-label a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .recaptcha-container {
+        margin: 20px 0;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .btn-block {
+        width: 100%;
+    }
+    
+    .auth-footer {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .auth-footer a {
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .auth-divider {
+        position: relative;
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e0e0e0;
+    }
+    
+    .auth-divider span {
+        position: relative;
+        background: white;
+        padding: 0 15px;
+        color: #999;
+        font-size: 14px;
+    }
+    
+    .social-login {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .social-btn {
+        flex: 1;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+    
+    .social-btn:hover {
+        background: #f8f9fa;
+        border-color: #667eea;
+    }
+    
+    .social-btn.google {
+        color: #ea4335;
+    }
+    
+    .social-btn.telegram {
+        color: #0088cc;
+    }
+    
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 30px 20px;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Password strength meter
+        $('#password').on('input', function() {
+            const password = $(this).val();
+            const strength = getPasswordStrength(password);
+            
+            const bar = $('.strength-bar');
+            const text = $('.strength-text');
+            
+            bar.removeClass('weak medium strong');
+            
+            if (password.length === 0) {
+                bar.addClass('');
+                text.text('');
+            } else if (strength === 'weak') {
+                bar.addClass('weak');
+                text.text('Weak password').css('color', '#dc3545');
+            } else if (strength === 'medium') {
+                bar.addClass('medium');
+                text.text('Medium password').css('color', '#ffc107');
+            } else {
+                bar.addClass('strong');
+                text.text('Strong password').css('color', '#28a745');
+            }
+        });
+        
+        // Registration form submission
+        $('#registerForm').submit(function(e) {
+            e.preventDefault();
+            
+            const username = $('#username').val();
+            const email = $('#email').val();
+            const password = $('#password').val();
+            const confirmPassword = $('#confirm_password').val();
+            const terms = $('#terms').is(':checked');
+            
+            if (!username || !email || !password) {
+                showAlert('error', 'Please fill in all required fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert('error', 'Passwords do not match');
+                return;
+            }
+            
+            if (!terms) {
+                showAlert('error', 'Please agree to the Terms of Service');
+                return;
+            }
+            
+            const passwordStrength = getPasswordStrength(password);
+            if (passwordStrength === 'weak') {
+                showAlert('warning', 'Your password is weak. Please use a stronger password.');
+                return;
+            }
+            
+            $('#registerForm button').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating account...');
+            
+            fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password,
+                    first_name: $('#first_name').val(),
+                    last_name: $('#last_name').val()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('token', data.access_token);
+                    showAlert('success', 'Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1500);
+                } else {
+                    showAlert('error', data.error || 'Registration failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('error', 'An error occurred. Please try again.');
+            })
+            .finally(() => {
+                $('#registerForm button').prop('disabled', false).html('Create Account');
+            });
+        });
+    });
+    
+    function getPasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score++;
+        if (password.length >= 12) score++;
+        if (/[A-Z]/.test(password)) score++;
+        if (/[a-z]/.test(password)) score++;
+        if (/[0-9]/.test(password)) score++;
+        if (/[^A-Za-z0-9]/.test(password)) score++;
+        
+        if (score < 3) return 'weak';
+        if (score < 5) return 'medium';
+        return 'strong';
+    }
+    
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const button = field.nextElementSibling;
+        if (field.type === 'password') {
+            field.type = 'text';
+            button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            field.type = 'password';
+            button.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    }
+    
+    function registerWithGoogle() {
+        window.location.href = '/auth/google';
+    }
+    
+    function registerWithTelegram() {
+        window.location.href = '/auth/telegram';
+    }
+    
+    function showAlert(type, message) {
+        if (typeof window.showAlert === 'function') {
+            window.showAlert(type, message);
+        } else {
+            alert(message);
+        }
+    }
+</script>
+{% endblock %}
