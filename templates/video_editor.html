@@ -1,0 +1,944 @@
+{% extends "base.html" %}
+
+{% block title %}Video Editor - Kinva Master{% endblock %}
+
+{% block body_class %}video-editor-page{% endblock %}
+
+{% block content %}
+<div class="video-editor">
+    <!-- Top Toolbar -->
+    <div class="editor-toolbar">
+        <div class="toolbar-left">
+            <button class="btn-icon" onclick="openProject()">
+                <i class="fas fa-folder-open"></i>
+            </button>
+            <button class="btn-icon" onclick="saveProject()">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="btn-icon" onclick="exportVideo()">
+                <i class="fas fa-download"></i>
+            </button>
+            <div class="divider"></div>
+            <button class="btn-icon" onclick="undo()">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button class="btn-icon" onclick="redo()">
+                <i class="fas fa-redo"></i>
+            </button>
+        </div>
+
+        <div class="toolbar-center">
+            <div class="project-title">
+                <input type="text" id="projectTitle" value="Untitled Project" placeholder="Project Title">
+            </div>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="btn-premium" onclick="showPremiumModal()">
+                <i class="fas fa-crown"></i> Upgrade
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div class="editor-main">
+        <!-- Left Panel - Media Library -->
+        <div class="media-panel">
+            <div class="panel-header">
+                <h3>Media</h3>
+                <button class="btn-upload" onclick="uploadMedia()">
+                    <i class="fas fa-plus"></i> Upload
+                </button>
+            </div>
+            <div class="media-tabs">
+                <button class="tab-btn active" data-tab="videos">Videos</button>
+                <button class="tab-btn" data-tab="images">Images</button>
+                <button class="tab-btn" data-tab="audio">Audio</button>
+            </div>
+            <div class="media-grid" id="mediaGrid">
+                {% for video in videos %}
+                <div class="media-item" draggable="true" data-type="video" data-path="{{ video.file_path }}">
+                    <video src="{{ video.file_path }}"></video>
+                    <div class="media-info">
+                        <span class="media-title">{{ video.title }}</span>
+                        <span class="media-duration">{{ video.duration|round|int }}s</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Center - Preview & Timeline -->
+        <div class="preview-panel">
+            <!-- Video Preview -->
+            <div class="video-preview">
+                <video id="previewVideo" controls></video>
+                <div class="preview-controls">
+                    <button onclick="playPreview()"><i class="fas fa-play"></i></button>
+                    <button onclick="pausePreview()"><i class="fas fa-pause"></i></button>
+                    <input type="range" id="previewTime" min="0" max="100" value="0">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalDuration">00:00</span>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline-container">
+                <div class="timeline-header">
+                    <div class="timeline-ruler" id="timelineRuler"></div>
+                </div>
+                <div class="timeline-tracks" id="timelineTracks">
+                    <div class="track video-track" data-track="0">
+                        <div class="track-header">
+                            <span>Video 1</span>
+                        </div>
+                        <div class="track-content" id="videoTrack1"></div>
+                    </div>
+                    <div class="track video-track" data-track="1">
+                        <div class="track-header">
+                            <span>Video 2</span>
+                        </div>
+                        <div class="track-content" id="videoTrack2"></div>
+                    </div>
+                    <div class="track audio-track" data-track="2">
+                        <div class="track-header">
+                            <span>Audio 1</span>
+                        </div>
+                        <div class="track-content" id="audioTrack1"></div>
+                    </div>
+                </div>
+                <div class="timeline-controls">
+                    <button onclick="zoomIn()"><i class="fas fa-search-plus"></i></button>
+                    <button onclick="zoomOut()"><i class="fas fa-search-minus"></i></button>
+                    <button onclick="fitTimeline()"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Effects & Properties -->
+        <div class="effects-panel">
+            <div class="panel-tabs">
+                <button class="tab-btn active" data-tab="effects">Effects</button>
+                <button class="tab-btn" data-tab="filters">Filters</button>
+                <button class="tab-btn" data-tab="transitions">Transitions</button>
+                <button class="tab-btn" data-tab="properties">Properties</button>
+            </div>
+
+            <!-- Effects Tab -->
+            <div class="panel-content active" id="effects-tab">
+                <div class="effects-grid">
+                    <div class="effect-item" onclick="addEffect('vintage')">
+                        <div class="effect-preview">🎞️</div>
+                        <span>Vintage</span>
+                    </div>
+                    <div class="effect-item" onclick="addEffect('cinematic')">
+                        <div class="effect-preview">🎬</div>
+                        <span>Cinematic</span>
+                    </div>
+                    <div class="effect-item" onclick="addEffect('black_white')">
+                        <div class="effect-preview">⚫</div>
+                        <span>B&W</span>
+                    </div>
+                    <div class="effect-item" onclick="addEffect('sepia')">
+                        <div class="effect-preview">🟫</div>
+                        <span>Sepia</span>
+                    </div>
+                    <div class="effect-item premium" onclick="addEffect('glitch')">
+                        <div class="effect-preview">💥</div>
+                        <span>Glitch</span>
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                    <div class="effect-item" onclick="addEffect('blur')">
+                        <div class="effect-preview">🌀</div>
+                        <span>Blur</span>
+                    </div>
+                    <div class="effect-item" onclick="addEffect('sharpen')">
+                        <div class="effect-preview">✨</div>
+                        <span>Sharpen</span>
+                    </div>
+                    <div class="effect-item premium" onclick="addEffect('neon')">
+                        <div class="effect-preview">🔥</div>
+                        <span>Neon</span>
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Tab -->
+            <div class="panel-content" id="filters-tab">
+                <div class="filters-list">
+                    <div class="filter-item" onclick="applyFilter('brightness')">
+                        <span>Brightness</span>
+                        <input type="range" min="0" max="200" value="100">
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('contrast')">
+                        <span>Contrast</span>
+                        <input type="range" min="0" max="200" value="100">
+                    </div>
+                    <div class="filter-item" onclick="applyFilter('saturation')">
+                        <span>Saturation</span>
+                        <input type="range" min="0" max="200" value="100">
+                    </div>
+                    <div class="filter-item premium" onclick="applyFilter('vignette')">
+                        <span>Vignette</span>
+                        <input type="range" min="0" max="100" value="0">
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transitions Tab -->
+            <div class="panel-content" id="transitions-tab">
+                <div class="transitions-grid">
+                    <div class="transition-item" onclick="addTransition('fade')">
+                        <div class="transition-preview">Fade</div>
+                        <span>Fade</span>
+                    </div>
+                    <div class="transition-item" onclick="addTransition('slide')">
+                        <div class="transition-preview">Slide</div>
+                        <span>Slide</span>
+                    </div>
+                    <div class="transition-item" onclick="addTransition('zoom')">
+                        <div class="transition-preview">Zoom</div>
+                        <span>Zoom</span>
+                    </div>
+                    <div class="transition-item premium" onclick="addTransition('glitch')">
+                        <div class="transition-preview">Glitch</div>
+                        <span>Glitch</span>
+                        <span class="premium-badge">⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Properties Tab -->
+            <div class="panel-content" id="properties-tab">
+                <div class="property-group">
+                    <label>Volume</label>
+                    <input type="range" id="volume" min="0" max="100" value="100">
+                </div>
+                <div class="property-group">
+                    <label>Speed</label>
+                    <input type="range" id="speed" min="0.25" max="4" step="0.25" value="1">
+                </div>
+                <div class="property-group">
+                    <label>Start Time</label>
+                    <input type="number" id="startTime" step="0.1">
+                </div>
+                <div class="property-group">
+                    <label>End Time</label>
+                    <input type="number" id="endTime" step="0.1">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .video-editor {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        background: #1a1a2e;
+    }
+    
+    .editor-toolbar {
+        background: #2d3748;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .btn-icon {
+        background: none;
+        border: none;
+        color: #a0aec0;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.3s;
+    }
+    
+    .btn-icon:hover {
+        background: #4a5568;
+        color: white;
+    }
+    
+    .divider {
+        width: 1px;
+        height: 30px;
+        background: #4a5568;
+        margin: 0 10px;
+    }
+    
+    .project-title input {
+        background: #1a1a2e;
+        border: 1px solid #4a5568;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        width: 200px;
+    }
+    
+    .btn-premium {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    
+    .editor-main {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+    
+    .media-panel {
+        width: 280px;
+        background: #2d3748;
+        border-right: 1px solid #4a5568;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .panel-header {
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .panel-header h3 {
+        color: white;
+        font-size: 16px;
+        margin: 0;
+    }
+    
+    .btn-upload {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .media-tabs {
+        display: flex;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .media-tabs .tab-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 10px;
+        color: #a0aec0;
+        cursor: pointer;
+    }
+    
+    .media-tabs .tab-btn.active {
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .media-grid {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .media-item {
+        background: #1a1a2e;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.3s;
+    }
+    
+    .media-item:hover {
+        transform: scale(1.02);
+    }
+    
+    .media-item video {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+    }
+    
+    .media-info {
+        padding: 8px;
+    }
+    
+    .media-title {
+        display: block;
+        color: white;
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+    
+    .media-duration {
+        color: #a0aec0;
+        font-size: 10px;
+    }
+    
+    .preview-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #1a1a2e;
+    }
+    
+    .video-preview {
+        background: #000;
+        margin: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .video-preview video {
+        width: 100%;
+        max-height: 300px;
+    }
+    
+    .preview-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #2d3748;
+    }
+    
+    .preview-controls button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 5px;
+    }
+    
+    .preview-controls input {
+        flex: 1;
+        height: 4px;
+        -webkit-appearance: none;
+        background: #4a5568;
+        border-radius: 2px;
+    }
+    
+    .preview-controls input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 12px;
+        height: 12px;
+        background: #667eea;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .preview-controls span {
+        color: #a0aec0;
+        font-size: 12px;
+    }
+    
+    .timeline-container {
+        background: #2d3748;
+        margin: 0 20px 20px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .timeline-header {
+        padding: 10px;
+        border-bottom: 1px solid #4a5568;
+        overflow-x: auto;
+    }
+    
+    .timeline-ruler {
+        height: 30px;
+        position: relative;
+        background: #1a1a2e;
+    }
+    
+    .timeline-tracks {
+        overflow-y: auto;
+        max-height: 200px;
+    }
+    
+    .track {
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .track-header {
+        padding: 8px 12px;
+        background: #1a1a2e;
+        color: #a0aec0;
+        font-size: 12px;
+    }
+    
+    .track-content {
+        height: 60px;
+        position: relative;
+        background: #2d3748;
+    }
+    
+    .timeline-clip {
+        position: absolute;
+        height: 50px;
+        background: #667eea;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+    
+    .timeline-clip:hover {
+        background: #5a67d8;
+    }
+    
+    .timeline-controls {
+        padding: 10px;
+        display: flex;
+        gap: 10px;
+        border-top: 1px solid #4a5568;
+    }
+    
+    .timeline-controls button {
+        background: #1a1a2e;
+        border: none;
+        color: #a0aec0;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .effects-panel {
+        width: 280px;
+        background: #2d3748;
+        border-left: 1px solid #4a5568;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .panel-tabs {
+        display: flex;
+        border-bottom: 1px solid #4a5568;
+    }
+    
+    .panel-tabs .tab-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 12px;
+        color: #a0aec0;
+        cursor: pointer;
+    }
+    
+    .panel-tabs .tab-btn.active {
+        color: #667eea;
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .panel-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        display: none;
+    }
+    
+    .panel-content.active {
+        display: block;
+    }
+    
+    .effects-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .effect-item {
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.3s;
+    }
+    
+    .effect-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .effect-preview {
+        font-size: 32px;
+        margin-bottom: 8px;
+    }
+    
+    .effect-item span {
+        display: block;
+        color: white;
+        font-size: 12px;
+    }
+    
+    .premium-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: gold;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 4px;
+        font-size: 8px;
+    }
+    
+    .filters-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filter-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+    }
+    
+    .filter-item span {
+        font-size: 12px;
+    }
+    
+    .filter-item input {
+        width: 150px;
+    }
+    
+    .transitions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .transition-item {
+        background: #1a1a2e;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+    }
+    
+    .transition-preview {
+        background: #667eea;
+        height: 40px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .property-group {
+        margin-bottom: 15px;
+    }
+    
+    .property-group label {
+        display: block;
+        color: #a0aec0;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+    
+    .property-group input {
+        width: 100%;
+        padding: 6px;
+        background: #1a1a2e;
+        border: 1px solid #4a5568;
+        color: white;
+        border-radius: 4px;
+    }
+    
+    @media (max-width: 1024px) {
+        .media-panel, .effects-panel {
+            width: 240px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentVideo = null;
+    let timelineClips = [];
+    let zoomLevel = 1;
+    let totalDuration = 0;
+    
+    $(document).ready(function() {
+        initVideoEditor();
+        loadVideos();
+    });
+    
+    function initVideoEditor() {
+        // Tab switching
+        $('.media-tabs .tab-btn').click(function() {
+            $('.media-tabs .tab-btn').removeClass('active');
+            $(this).addClass('active');
+        });
+        
+        $('.panel-tabs .tab-btn').click(function() {
+            $('.panel-tabs .tab-btn').removeClass('active');
+            $(this).addClass('active');
+            $('.panel-content').removeClass('active');
+            $('#' + $(this).data('tab') + '-tab').addClass('active');
+        });
+        
+        // Drag and drop
+        $('.media-item').on('dragstart', function(e) {
+            e.originalEvent.dataTransfer.setData('text/plain', JSON.stringify({
+                type: $(this).data('type'),
+                path: $(this).data('path')
+            }));
+        });
+        
+        $('.track-content').on('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        $('.track-content').on('drop', function(e) {
+            e.preventDefault();
+            const data = JSON.parse(e.originalEvent.dataTransfer.getData('text/plain'));
+            const offsetX = e.originalEvent.offsetX;
+            const track = $(this).closest('.track').data('track');
+            const startTime = (offsetX / $(this).width()) * totalDuration;
+            
+            addClipToTimeline(data, track, startTime);
+        });
+        
+        // Video preview controls
+        const video = document.getElementById('previewVideo');
+        const timeSlider = document.getElementById('previewTime');
+        
+        video.addEventListener('timeupdate', function() {
+            if (video.duration) {
+                timeSlider.value = (video.currentTime / video.duration) * 100;
+                document.getElementById('currentTime').textContent = formatTime(video.currentTime);
+                document.getElementById('totalDuration').textContent = formatTime(video.duration);
+            }
+        });
+        
+        timeSlider.addEventListener('input', function() {
+            if (video.duration) {
+                video.currentTime = (this.value / 100) * video.duration;
+            }
+        });
+        
+        // Volume control
+        document.getElementById('volume').addEventListener('input', function() {
+            if (video) video.volume = this.value / 100;
+        });
+        
+        // Speed control
+        document.getElementById('speed').addEventListener('input', function() {
+            if (video) video.playbackRate = parseFloat(this.value);
+        });
+    }
+    
+    function loadVideos() {
+        // Load videos from API
+        fetch('/api/videos')
+            .then(response => response.json())
+            .then(videos => {
+                const grid = document.getElementById('mediaGrid');
+                grid.innerHTML = videos.map(video => `
+                    <div class="media-item" draggable="true" data-type="video" data-path="${video.file_path}">
+                        <video src="${video.file_path}"></video>
+                        <div class="media-info">
+                            <span class="media-title">${video.title}</span>
+                            <span class="media-duration">${Math.round(video.duration)}s</span>
+                        </div>
+                    </div>
+                `).join('');
+            });
+    }
+    
+    function addClipToTimeline(data, track, startTime) {
+        const clip = {
+            id: Date.now(),
+            type: data.type,
+            path: data.path,
+            track: track,
+            start: startTime,
+            duration: 5,
+            end: startTime + 5
+        };
+        
+        timelineClips.push(clip);
+        renderTimeline();
+    }
+    
+    function renderTimeline() {
+        const videoTrack1 = document.getElementById('videoTrack1');
+        const videoTrack2 = document.getElementById('videoTrack2');
+        const audioTrack1 = document.getElementById('audioTrack1');
+        
+        // Clear tracks
+        videoTrack1.innerHTML = '';
+        videoTrack2.innerHTML = '';
+        audioTrack1.innerHTML = '';
+        
+        // Calculate total duration
+        totalDuration = Math.max(...timelineClips.map(c => c.end), 10);
+        
+        // Render timeline ruler
+        renderTimelineRuler();
+        
+        // Render clips
+        timelineClips.forEach(clip => {
+            const clipElement = document.createElement('div');
+            clipElement.className = 'timeline-clip';
+            clipElement.style.left = (clip.start / totalDuration * 100) + '%';
+            clipElement.style.width = (clip.duration / totalDuration * 100) + '%';
+            clipElement.innerHTML = clip.type === 'video' ? '🎬 Video' : '🎵 Audio';
+            clipElement.onclick = () => selectClip(clip.id);
+            
+            if (clip.track === 0) videoTrack1.appendChild(clipElement);
+            else if (clip.track === 1) videoTrack2.appendChild(clipElement);
+            else if (clip.track === 2) audioTrack1.appendChild(clipElement);
+        });
+    }
+    
+    function renderTimelineRuler() {
+        const ruler = document.getElementById('timelineRuler');
+        ruler.innerHTML = '';
+        
+        for (let i = 0; i <= totalDuration; i++) {
+            const marker = document.createElement('div');
+            marker.style.position = 'absolute';
+            marker.style.left = (i / totalDuration * 100) + '%';
+            marker.style.bottom = '0';
+            marker.style.width = '1px';
+            marker.style.height = '10px';
+            marker.style.background = '#4a5568';
+            ruler.appendChild(marker);
+            
+            const label = document.createElement('span');
+            label.style.position = 'absolute';
+            label.style.left = (i / totalDuration * 100) + '%';
+            label.style.bottom = '12px';
+            label.style.fontSize = '10px';
+            label.style.color = '#a0aec0';
+            label.textContent = formatTime(i);
+            ruler.appendChild(label);
+        }
+    }
+    
+    function selectClip(clipId) {
+        const clip = timelineClips.find(c => c.id === clipId);
+        if (clip) {
+            document.getElementById('startTime').value = clip.start;
+            document.getElementById('endTime').value = clip.end;
+        }
+    }
+    
+    function addEffect(effect) {
+        alert(`Adding ${effect} effect to video`);
+    }
+    
+    function applyFilter(filter) {
+        alert(`Applying ${filter} filter`);
+    }
+    
+    function addTransition(transition) {
+        alert(`Adding ${transition} transition`);
+    }
+    
+    function playPreview() {
+        const video = document.getElementById('previewVideo');
+        video.play();
+    }
+    
+    function pausePreview() {
+        const video = document.getElementById('previewVideo');
+        video.pause();
+    }
+    
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    function zoomIn() {
+        zoomLevel += 0.25;
+        document.querySelector('.timeline-container').style.transform = `scaleX(${zoomLevel})`;
+    }
+    
+    function zoomOut() {
+        zoomLevel = Math.max(0.5, zoomLevel - 0.25);
+        document.querySelector('.timeline-container').style.transform = `scaleX(${zoomLevel})`;
+    }
+    
+    function fitTimeline() {
+        zoomLevel = 1;
+        document.querySelector('.timeline-container').style.transform = 'scaleX(1)';
+    }
+    
+    function openProject() {
+        alert('Open project feature coming soon');
+    }
+    
+    function saveProject() {
+        alert('Save project feature coming soon');
+    }
+    
+    function exportVideo() {
+        alert('Export video feature coming soon');
+    }
+    
+    function undo() {
+        alert('Undo feature coming soon');
+    }
+    
+    function redo() {
+        alert('Redo feature coming soon');
+    }
+    
+    function uploadMedia() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'video/*,image/*,audio/*';
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            // Upload file to server
+            const formData = new FormData();
+            formData.append('file', file);
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            }).then(() => loadVideos());
+        };
+        input.click();
+    }
+    
+    function showPremiumModal() {
+        $('#premiumModal').addClass('active');
+    }
+</script>
+{% endblock %}
