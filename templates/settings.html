@@ -1,0 +1,776 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Kinva Master{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="settings-header">
+        <h1>Settings</h1>
+        <p>Manage your account preferences</p>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-sidebar">
+            <div class="settings-nav">
+                <button class="settings-nav-btn active" data-section="profile">
+                    <i class="fas fa-user"></i> Profile
+                </button>
+                <button class="settings-nav-btn" data-section="account">
+                    <i class="fas fa-lock"></i> Account
+                </button>
+                <button class="settings-nav-btn" data-section="preferences">
+                    <i class="fas fa-sliders-h"></i> Preferences
+                </button>
+                <button class="settings-nav-btn" data-section="notifications">
+                    <i class="fas fa-bell"></i> Notifications
+                </button>
+                <button class="settings-nav-btn" data-section="privacy">
+                    <i class="fas fa-shield-alt"></i> Privacy
+                </button>
+                <button class="settings-nav-btn" data-section="billing">
+                    <i class="fas fa-credit-card"></i> Billing
+                </button>
+                <button class="settings-nav-btn" data-section="api">
+                    <i class="fas fa-code"></i> API Keys
+                </button>
+            </div>
+        </div>
+
+        <div class="settings-content">
+            <!-- Profile Section -->
+            <div class="settings-section active" id="profile-section">
+                <h2>Profile Settings</h2>
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" name="first_name" value="{{ user.first_name }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" name="last_name" value="{{ user.last_name }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" value="{{ user.username }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" value="{{ user.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea name="bio" rows="4">{{ user.bio }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+
+            <!-- Account Section -->
+            <div class="settings-section" id="account-section">
+                <h2>Account Settings</h2>
+                <form id="passwordForm">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" name="current_password">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" name="new_password">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirm_password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+                
+                <hr>
+                
+                <div class="danger-zone">
+                    <h3>Danger Zone</h3>
+                    <p>Once you delete your account, there is no going back. Please be certain.</p>
+                    <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+                </div>
+            </div>
+
+            <!-- Preferences Section -->
+            <div class="settings-section" id="preferences-section">
+                <h2>Preferences</h2>
+                <div class="form-group">
+                    <label>Language</label>
+                    <select id="language">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="hi">हिन्दी</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Theme</label>
+                    <select id="theme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="system">System Default</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Default Quality</label>
+                    <select id="defaultQuality">
+                        <option value="720p">720p</option>
+                        <option value="1080p">1080p</option>
+                        <option value="4k">4K (Premium)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Default Format</label>
+                    <select id="defaultFormat">
+                        <option value="mp4">MP4</option>
+                        <option value="avi">AVI</option>
+                        <option value="mov">MOV</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Auto-save</label>
+                    <label class="switch">
+                        <input type="checkbox" id="autoSave">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="savePreferences()">Save Preferences</button>
+            </div>
+
+            <!-- Notifications Section -->
+            <div class="settings-section" id="notifications-section">
+                <h2>Notification Settings</h2>
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Email Notifications</h4>
+                        <p>Receive updates and announcements via email</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="emailNotifications">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Telegram Notifications</h4>
+                        <p>Get notifications on Telegram</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="telegramNotifications">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Project Updates</h4>
+                        <p>Notify when projects are processed</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="projectNotifications">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="notification-setting">
+                    <div class="setting-info">
+                        <h4>Marketing Emails</h4>
+                        <p>Receive promotional offers and news</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="marketingEmails">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="saveNotifications()">Save Settings</button>
+            </div>
+
+            <!-- Privacy Section -->
+            <div class="settings-section" id="privacy-section">
+                <h2>Privacy Settings</h2>
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Profile Visibility</h4>
+                        <p>Make your profile public</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="profileVisibility">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Project Visibility</h4>
+                        <p>Allow others to see your projects</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="projectVisibility">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="privacy-setting">
+                    <div class="setting-info">
+                        <h4>Activity Status</h4>
+                        <p>Show when you're active</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="activityStatus">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="savePrivacy()">Save Settings</button>
+            </div>
+
+            <!-- Billing Section -->
+            <div class="settings-section" id="billing-section">
+                <h2>Billing Information</h2>
+                {% if user.is_premium %}
+                <div class="billing-info">
+                    <p><strong>Plan:</strong> {{ user.plan }}</p>
+                    <p><strong>Status:</strong> Active</p>
+                    <p><strong>Next Billing Date:</strong> {{ user.premium_until[:10] }}</p>
+                    <button class="btn btn-outline" onclick="cancelSubscription()">Cancel Subscription</button>
+                </div>
+                {% else %}
+                <div class="billing-info">
+                    <p>You are on the free plan.</p>
+                    <button class="btn btn-primary" onclick="location.href='/premium'">Upgrade to Premium</button>
+                </div>
+                {% endif %}
+                
+                <h3>Payment Methods</h3>
+                <div class="payment-methods">
+                    <div class="payment-method">
+                        <i class="fab fa-cc-visa"></i>
+                        <span>Visa ending in 4242</span>
+                        <button class="btn-icon" onclick="removePaymentMethod()"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <button class="btn btn-outline" onclick="addPaymentMethod()">Add Payment Method</button>
+                </div>
+                
+                <h3>Invoice History</h3>
+                <div class="invoice-list">
+                    {% for invoice in invoices %}
+                    <div class="invoice-item">
+                        <span>{{ invoice.date }}</span>
+                        <span>${{ invoice.amount }}</span>
+                        <a href="{{ invoice.pdf_url }}" target="_blank">Download PDF</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- API Keys Section -->
+            <div class="settings-section" id="api-section">
+                <h2>API Keys</h2>
+                <p>Generate API keys to access Kinva Master programmatically</p>
+                <button class="btn btn-primary" onclick="generateApiKey()">Generate New API Key</button>
+                <div class="api-keys-list">
+                    {% for key in api_keys %}
+                    <div class="api-key-item">
+                        <div class="key-info">
+                            <span class="key-name">{{ key.name }}</span>
+                            <span class="key-date">Created: {{ key.created_at[:10] }}</span>
+                        </div>
+                        <div class="key-actions">
+                            <button onclick="copyApiKey('{{ key.key }}')"><i class="fas fa-copy"></i></button>
+                            <button onclick="revokeApiKey({{ key.id }})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .settings-header {
+        margin-bottom: 30px;
+    }
+    
+    .settings-header h1 {
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .settings-container {
+        display: flex;
+        gap: 30px;
+    }
+    
+    .settings-sidebar {
+        width: 250px;
+        flex-shrink: 0;
+    }
+    
+    .settings-nav {
+        position: sticky;
+        top: 80px;
+        background: white;
+        border-radius: 12px;
+        padding: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .settings-nav-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 12px 15px;
+        background: none;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #666;
+        transition: all 0.3s;
+    }
+    
+    .settings-nav-btn:hover {
+        background: #f5f5f5;
+    }
+    
+    .settings-nav-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .settings-content {
+        flex: 1;
+    }
+    
+    .settings-section {
+        display: none;
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .settings-section.active {
+        display: block;
+    }
+    
+    .settings-section h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+    }
+    
+    .settings-section h3 {
+        margin: 20px 0 10px;
+        font-size: 18px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+    
+    .form-group input, .form-group select, .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.3s;
+        border-radius: 34px;
+    }
+    
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+        background-color: #667eea;
+    }
+    
+    input:checked + .slider:before {
+        transform: translateX(26px);
+    }
+    
+    .danger-zone {
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        background: #fff5f5;
+    }
+    
+    .danger-zone h3 {
+        color: #dc3545;
+        margin-top: 0;
+    }
+    
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    
+    .notification-setting, .privacy-setting {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .setting-info h4 {
+        margin-bottom: 5px;
+    }
+    
+    .setting-info p {
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .payment-methods {
+        margin-bottom: 20px;
+    }
+    
+    .payment-method {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .payment-method i {
+        font-size: 24px;
+    }
+    
+    .invoice-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .api-key-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .key-name {
+        font-weight: 500;
+    }
+    
+    .key-date {
+        font-size: 12px;
+        color: #999;
+        display: block;
+    }
+    
+    .key-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .key-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #666;
+        padding: 5px;
+    }
+    
+    hr {
+        margin: 30px 0;
+        border-color: #e0e0e0;
+    }
+    
+    @media (max-width: 768px) {
+        .settings-container {
+            flex-direction: column;
+        }
+        
+        .settings-sidebar {
+            width: 100%;
+        }
+        
+        .settings-nav {
+            display: flex;
+            overflow-x: auto;
+            position: static;
+        }
+        
+        .settings-nav-btn {
+            white-space: nowrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Load saved settings
+        loadSettings();
+        
+        // Navigation
+        $('.settings-nav-btn').click(function() {
+            $('.settings-nav-btn').removeClass('active');
+            $(this).addClass('active');
+            $('.settings-section').removeClass('active');
+            $('#' + $(this).data('section') + '-section').addClass('active');
+        });
+        
+        // Profile form
+        $('#profileForm').submit(function(e) {
+            e.preventDefault();
+            const formData = $(this).serialize();
+            fetch('/api/users/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: formData
+            }).then(() => {
+                showAlert('success', 'Profile updated successfully');
+            });
+        });
+        
+        // Password form
+        $('#passwordForm').submit(function(e) {
+            e.preventDefault();
+            const newPassword = $('input[name="new_password"]').val();
+            const confirmPassword = $('input[name="confirm_password"]').val();
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('error', 'Passwords do not match');
+                return;
+            }
+            
+            fetch('/api/auth/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    current_password: $('input[name="current_password"]').val(),
+                    new_password: newPassword
+                })
+            }).then(() => {
+                showAlert('success', 'Password changed successfully');
+                $('#passwordForm')[0].reset();
+            });
+        });
+    });
+    
+    function loadSettings() {
+        fetch('/api/users/settings', {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
+        }).then(res => res.json())
+          .then(settings => {
+              $('#language').val(settings.language);
+              $('#theme').val(settings.theme);
+              $('#defaultQuality').val(settings.default_quality);
+              $('#defaultFormat').val(settings.default_format);
+              $('#autoSave').prop('checked', settings.auto_save);
+              $('#emailNotifications').prop('checked', settings.email_notifications);
+              $('#telegramNotifications').prop('checked', settings.telegram_notifications);
+              $('#projectNotifications').prop('checked', settings.project_notifications);
+              $('#marketingEmails').prop('checked', settings.marketing_emails);
+              $('#profileVisibility').prop('checked', settings.profile_visible);
+              $('#projectVisibility').prop('checked', settings.project_visible);
+              $('#activityStatus').prop('checked', settings.activity_status);
+          });
+    }
+    
+    function savePreferences() {
+        const settings = {
+            language: $('#language').val(),
+            theme: $('#theme').val(),
+            default_quality: $('#defaultQuality').val(),
+            default_format: $('#defaultFormat').val(),
+            auto_save: $('#autoSave').is(':checked')
+        };
+        
+        fetch('/api/users/settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify(settings)
+        }).then(() => {
+            showAlert('success', 'Preferences saved');
+        });
+    }
+    
+    function saveNotifications() {
+        const settings = {
+            email_notifications: $('#emailNotifications').is(':checked'),
+            telegram_notifications: $('#telegramNotifications').is(':checked'),
+            project_notifications: $('#projectNotifications').is(':checked'),
+            marketing_emails: $('#marketingEmails').is(':checked')
+        };
+        
+        fetch('/api/users/settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify(settings)
+        }).then(() => {
+            showAlert('success', 'Notification settings saved');
+        });
+    }
+    
+    function savePrivacy() {
+        const settings = {
+            profile_visible: $('#profileVisibility').is(':checked'),
+            project_visible: $('#projectVisibility').is(':checked'),
+            activity_status: $('#activityStatus').is(':checked')
+        };
+        
+        fetch('/api/users/settings', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify(settings)
+        }).then(() => {
+            showAlert('success', 'Privacy settings saved');
+        });
+    }
+    
+    function deleteAccount() {
+        if (confirm('Are you absolutely sure? This action cannot be undone.')) {
+            const password = prompt('Enter your password to confirm:');
+            if (password) {
+                fetch('/api/users/delete', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ password })
+                }).then(() => {
+                    localStorage.removeItem('token');
+                    window.location.href = '/';
+                });
+            }
+        }
+    }
+    
+    function cancelSubscription() {
+        if (confirm('Are you sure you want to cancel your subscription?')) {
+            fetch('/api/subscription/cancel', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            }).then(() => {
+                showAlert('success', 'Subscription cancelled');
+                location.reload();
+            });
+        }
+    }
+    
+    function addPaymentMethod() {
+        alert('Payment method feature coming soon');
+    }
+    
+    function removePaymentMethod() {
+        alert('Remove payment method feature coming soon');
+    }
+    
+    function generateApiKey() {
+        const name = prompt('Enter a name for this API key:');
+        if (name) {
+            fetch('/api/users/api-keys', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                },
+                body: JSON.stringify({ name })
+            }).then(res => res.json())
+              .then(data => {
+                  showAlert('success', `API Key: ${data.key}\nCopy it now, you won't see it again`);
+                  location.reload();
+              });
+        }
+    }
+    
+    function copyApiKey(key) {
+        navigator.clipboard.writeText(key);
+        showAlert('success', 'API Key copied to clipboard');
+    }
+    
+    function revokeApiKey(id) {
+        if (confirm('Revoke this API key?')) {
+            fetch(`/api/users/api-keys/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+            }).then(() => location.reload());
+        }
+    }
+</script>
+{% endblock %}
