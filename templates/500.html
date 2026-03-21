@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - Kinva Master{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-container">
+        <div class="error-code">500</div>
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>Server Error</h1>
+        <p>Something went wrong on our end. Please try again later.</p>
+        <div class="error-actions">
+            <a href="{{ url_for('web.index') }}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Go Home
+            </a>
+            <button onclick="location.reload()" class="btn btn-outline">
+                <i class="fas fa-sync-alt"></i> Try Again
+            </button>
+        </div>
+        <div class="error-info">
+            <p>Our team has been notified of this issue. If the problem persists, please contact support.</p>
+            <div class="contact-options">
+                <a href="{{ url_for('web.contact') }}" class="contact-link">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+                <a href="https://t.me/{{ config.ADMIN_CONTACT }}" target="_blank" class="contact-link">
+                    <i class="fab fa-telegram"></i> Telegram Support
+                </a>
+            </div>
+            <div class="error-trace">
+                <details>
+                    <summary>Error Details (for developers)</summary>
+                    <pre>{{ error_trace or 'No trace available' }}</pre>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-page {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .error-container {
+        max-width: 600px;
+        text-align: center;
+        background: white;
+        border-radius: 20px;
+        padding: 50px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .error-code {
+        font-size: 120px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        margin-bottom: 20px;
+    }
+    
+    .error-icon {
+        font-size: 80px;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    
+    .error-container h1 {
+        font-size: 28px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .error-container p {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    
+    .error-info {
+        text-align: left;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        font-size: 14px;
+        color: #666;
+    }
+    
+    .contact-options {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+    }
+    
+    .contact-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: white;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #667eea;
+        transition: all 0.3s;
+    }
+    
+    .contact-link:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .error-trace {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .error-trace details {
+        cursor: pointer;
+    }
+    
+    .error-trace summary {
+        color: #999;
+        font-size: 12px;
+    }
+    
+    .error-trace pre {
+        margin-top: 10px;
+        padding: 10px;
+        background: #2d3748;
+        color: #a0aec0;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-size: 11px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    @media (max-width: 480px) {
+        .error-container {
+            padding: 30px 20px;
+        }
+        
+        .error-code {
+            font-size: 80px;
+        }
+        
+        .error-actions {
+            flex-direction: column;
+        }
+        
+        .contact-options {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
