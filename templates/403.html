@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Access Denied - Kinva Master{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-container">
+        <div class="error-code">403</div>
+        <div class="error-icon">
+            <i class="fas fa-ban"></i>
+        </div>
+        <h1>Access Denied</h1>
+        <p>Sorry, you don't have permission to access this page.</p>
+        <div class="error-actions">
+            {% if session.user_id %}
+                <a href="{{ url_for('web.dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Go to Dashboard
+                </a>
+                <a href="{{ url_for('web.contact') }}" class="btn btn-outline">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+            {% else %}
+                <a href="{{ url_for('web.login') }}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="{{ url_for('web.index') }}" class="btn btn-outline">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            {% endif %}
+        </div>
+        <div class="error-info">
+            <p>If you believe this is an error, please contact support with the following information:</p>
+            <ul>
+                <li>Error Code: 403</li>
+                <li>URL: {{ request.path }}</li>
+                <li>Time: {{ now() }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-page {
+        min-height: calc(100vh - 200px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .error-container {
+        max-width: 600px;
+        text-align: center;
+        background: white;
+        border-radius: 20px;
+        padding: 50px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    
+    .error-code {
+        font-size: 120px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        margin-bottom: 20px;
+    }
+    
+    .error-icon {
+        font-size: 80px;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    
+    .error-container h1 {
+        font-size: 28px;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .error-container p {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 40px;
+    }
+    
+    .error-info {
+        text-align: left;
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        font-size: 12px;
+        color: #666;
+    }
+    
+    .error-info ul {
+        margin: 10px 0 0 20px;
+    }
+    
+    .error-info li {
+        margin: 5px 0;
+    }
+    
+    @media (max-width: 480px) {
+        .error-container {
+            padding: 30px 20px;
+        }
+        
+        .error-code {
+            font-size: 80px;
+        }
+        
+        .error-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
