@@ -24,15 +24,20 @@ logs/
 # Environment
 .env
 .env.local
+.env.production
+.env.development
 
 # IDE
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
 
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Git
 .git/
@@ -43,6 +48,7 @@ Thumbs.db
 tests/
 .coverage
 htmlcov/
+.pytest_cache/
 
 # Docs
 docs/
@@ -53,3 +59,14 @@ docs/
 Dockerfile
 docker-compose.yml
 .dockerignore
+
+# Node (if any)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Secrets
+*.key
+*.pem
+*.crt
+*.p12
