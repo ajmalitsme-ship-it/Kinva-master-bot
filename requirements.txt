@@ -11,9 +11,9 @@ SQLAlchemy==2.0.23
 psycopg2-binary==2.9.9
 redis==5.0.1
 
-# Image Processing
-Pillow==10.1.0
+# Image Processing (headless version - no GUI dependencies)
 opencv-python-headless==4.8.1.78
+Pillow==10.1.0
 numpy==1.24.3
 
 # Video Processing
