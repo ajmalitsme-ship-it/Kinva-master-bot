@@ -10,14 +10,9 @@ from .timeline import Timeline, timeline
 from .layers import LayerManager, layer_manager
 
 __all__ = [
-    'CanvaEditor',
-    'canva_editor',
-    'VideoEditor',
-    'video_editor',
-    'ImageEditor',
-    'image_editor',
-    'Timeline',
-    'timeline',
-    'LayerManager',
-    'layer_manager'
+    'CanvaEditor', 'canva_editor',
+    'VideoEditor', 'video_editor',
+    'ImageEditor', 'image_editor',
+    'Timeline', 'timeline',
+    'LayerManager', 'layer_manager'
 ]
