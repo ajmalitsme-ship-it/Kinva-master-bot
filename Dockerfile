@@ -2,46 +2,43 @@
 # KINVA MASTER - DOCKERFILE (Bullseye)
 # ============================================
 
-# Base image with Debian Bullseye
-FROM python:3.11-slim-bullseye
+FROM python:3.11-slim
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies (for Bullseye)
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgl1 \
     libglib2.0-0 \
-    libxcb1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements
 COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
 COPY . .
 
-# Create directories
-RUN mkdir -p uploads outputs logs data fonts static/css/themes static/js/lib static/images/{icons,backgrounds,templates}
+# ============================================
+# FIX: Create missing __init__.py files
+# ============================================
+RUN mkdir -p src/utils && \
+    echo "from .helpers import allowed_file, format_size, get_file_info" > src/utils/__init__.py && \
+    echo "" >> src/utils/__init__.py && \
+    echo "__all__ = ['allowed_file', 'format_size', 'get_file_info']" >> src/utils/__init__.py && \
+    echo '__version__ = "1.0.0"' > src/__init__.py && \
+    touch src/handlers/__init__.py && \
+    touch src/processors/__init__.py && \
+    touch src/editors/__init__.py && \
+    touch src/payment/__init__.py && \
+    touch src/api/__init__.py
 
-# Run setup script
-RUN chmod +x setup.sh && ./setup.sh || true
+RUN mkdir -p uploads outputs logs data fonts
 
-# Expose port
 EXPOSE 5000
 
-# Run application
 CMD ["gunicorn", "src.app:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "--timeout", "120"]
