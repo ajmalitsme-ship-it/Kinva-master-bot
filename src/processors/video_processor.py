@@ -22,7 +22,7 @@ except ImportError as e:
     print(f"Warning: Video processing imports failed: {e}")
 
 from ..config import Config
-from ..utils import get_video_info, cleanup_file, TemporaryDirectory, format_file_size
+from ..utils.video_utils import get_video_info, cleanup_file, TemporaryDirectory, format_file_size
 
 logger = logging.getLogger(__name__)
 
