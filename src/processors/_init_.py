@@ -12,18 +12,11 @@ from .effects import EffectsProcessor, effects_processor
 from .filters import FiltersProcessor, filters_processor
 
 __all__ = [
-    'VideoProcessor',
-    'video_processor',
-    'ImageProcessor',
-    'image_processor',
-    'AudioProcessor',
-    'audio_processor',
-    'Watermark',
-    'watermark',
-    'CompressionProcessor',
-    'compression_processor',
-    'EffectsProcessor',
-    'effects_processor',
-    'FiltersProcessor',
-    'filters_processor'
+    'VideoProcessor', 'video_processor',
+    'ImageProcessor', 'image_processor',
+    'AudioProcessor', 'audio_processor',
+    'Watermark', 'watermark',
+    'CompressionProcessor', 'compression_processor',
+    'EffectsProcessor', 'effects_processor',
+    'FiltersProcessor', 'filters_processor'
 ]
