@@ -1,5 +1,5 @@
 """
-API Package - REST API endpoints for external integrations
+API Package - REST API endpoints
 Author: @kinva_master
 """
 
@@ -12,6 +12,7 @@ from .payments import payments_bp
 from .templates import templates_bp
 from .admin import admin_bp
 from .webhooks import webhooks_bp
+from .recaptcha import recaptcha_bp
 
 __all__ = [
     'auth_bp',
@@ -22,5 +23,6 @@ __all__ = [
     'payments_bp',
     'templates_bp',
     'admin_bp',
-    'webhooks_bp'
+    'webhooks_bp',
+    'recaptcha_bp'
 ]
