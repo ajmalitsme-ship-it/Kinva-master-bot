@@ -2,7 +2,7 @@ cat > src/utils/__init__.py << 'EOF'
 """
 Utils Package - Helper functions for Kinva Master
 """
-
+from ..utils.video_utils import get_video_info
 # Import ALL needed functions from helpers
 from .helpers import (
     get_video_info,
