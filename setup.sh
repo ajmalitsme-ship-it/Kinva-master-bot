@@ -1,10 +1,9 @@
 #!/bin/bash
-
 # ============================================
-# KINVA MASTER - SETUP SCRIPT
+# KINVA MASTER - SETUP SCRIPT (FULLY FIXED)
 # ============================================
 
-echo "🎬 𝐊ɪɴᴠᴀ 𝐌ᴀꜱᴛᴇʀ ᴀʟɪᴠᴇ"
+echo "🎬 KINVA MASTER - Setup Script"
 echo "================================"
 echo ""
 
@@ -15,90 +14,31 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[✓]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[✗]${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[!]${NC} $1"
-}
-
-print_info() {
-    echo -e "${BLUE}[i]${NC} $1"
-}
-
-# Function to check if command exists
-command_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
+print_status() { echo -e "${GREEN}[✓]${NC} $1"; }
+print_error() { echo -e "${RED}[✗]${NC} $1"; }
+print_warning() { echo -e "${YELLOW}[!]${NC} $1"; }
+print_info() { echo -e "${BLUE}[i]${NC} $1"; }
 
 # ============================================
-# CHECK SYSTEM REQUIREMENTS
+# CHECK PYTHON VERSION
 # ============================================
+print_info "Checking Python version..."
+python_version=$(python3 --version 2>&1 | awk '{print $2}')
+required_version="3.8.0"
 
-print_info "Checking system requirements..."
-
-# Check Python version
-if command_exists python3; then
-    python_version=$(python3 --version 2>&1 | awk '{print $2}')
+if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" = "$required_version" ]; then
     print_status "Python $python_version detected"
-    
-    # Check Python version is 3.8+
-    required_version="3.8.0"
-    if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" = "$required_version" ]; then
-        print_status "Python version meets requirements (>=3.8)"
-    else
-        print_error "Python version $python_version is too old. Please upgrade to Python 3.8+"
-        exit 1
-    fi
 else
-    print_error "Python 3 is not installed. Please install Python 3.8+"
+    print_error "Python 3.8+ required. Found $python_version"
     exit 1
 fi
-
-# Check pip
-if command_exists pip3; then
-    print_status "pip3 detected"
-else
-    print_warning "pip3 not found. Installing..."
-    python3 -m ensurepip --upgrade
-fi
-
-# Check FFmpeg
-if command_exists ffmpeg; then
-    ffmpeg_version=$(ffmpeg -version | head -n1 | awk '{print $3}')
-    print_status "FFmpeg $ffmpeg_version detected"
-else
-    print_warning "FFmpeg not found. Please install FFmpeg for video processing"
-    print_info "On Ubuntu/Debian: sudo apt-get install ffmpeg"
-    print_info "On macOS: brew install ffmpeg"
-    print_info "On Windows: Download from ffmpeg.org"
-fi
-
-echo ""
-print_info "Creating virtual environment..."
 
 # ============================================
 # CREATE VIRTUAL ENVIRONMENT
 # ============================================
-
-# Check if virtual environment already exists
+print_info "Creating virtual environment..."
 if [ -d "venv" ]; then
     print_warning "Virtual environment already exists"
-    read -p "Do you want to recreate it? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        rm -rf venv
-        python3 -m venv venv
-        print_status "Virtual environment recreated"
-    else
-        print_status "Using existing virtual environment"
-    fi
 else
     python3 -m venv venv
     print_status "Virtual environment created"
@@ -111,8 +51,6 @@ print_status "Virtual environment activated"
 # ============================================
 # UPGRADE PIP
 # ============================================
-
-echo ""
 print_info "Upgrading pip..."
 pip install --upgrade pip > /dev/null 2>&1
 print_status "Pip upgraded"
@@ -120,11 +58,7 @@ print_status "Pip upgraded"
 # ============================================
 # INSTALL DEPENDENCIES
 # ============================================
-
-echo ""
 print_info "Installing Python dependencies..."
-
-# Check if requirements.txt exists
 if [ -f "requirements.txt" ]; then
     pip install -r requirements.txt
     if [ $? -eq 0 ]; then
@@ -141,11 +75,8 @@ fi
 # ============================================
 # CREATE DIRECTORY STRUCTURE
 # ============================================
-
-echo ""
 print_info "Creating directory structure..."
 
-# Create main directories
 mkdir -p uploads/{images,videos,audio,designs,projects,temp,archives}
 mkdir -p outputs/{images,videos,audio,gifs,designs}
 mkdir -p logs
@@ -160,175 +91,222 @@ mkdir -p thumbnails
 print_status "Directories created"
 
 # ============================================
-# DOWNLOAD FONTS
+# CREATE ALL __init__.py FILES (CRITICAL FIX!)
 # ============================================
+print_info "Creating __init__.py files..."
 
-echo ""
-print_info "Downloading fonts..."
+# Create src directory if not exists
+mkdir -p src
+mkdir -p src/utils
+mkdir -p src/handlers
+mkdir -p src/processors
+mkdir -p src/editors
+mkdir -p src/payment
+mkdir -p src/api
 
-# Create Python script to download fonts
-cat > /tmp/download_fonts.py << 'EOF'
-import os
-import requests
-from pathlib import Path
+# Create src/__init__.py
+cat > src/__init__.py << 'EOF'
+"""
+Kinva Master - Main Package
+Author: @kinva_master
+"""
+__version__ = "1.0.0"
+__author__ = "Kinva Master"
+__license__ = "MIT"
+EOF
+print_status "Created src/__init__.py"
 
-fonts_dir = Path('fonts')
-fonts_dir.mkdir(exist_ok=True)
+# Create src/utils/__init__.py (MOST IMPORTANT - FIXES THE ERROR!)
+cat > src/utils/__init__.py << 'EOF'
+"""
+Utils Package - Utility functions and helpers
+Author: @kinva_master
+"""
+from .helpers import (
+    allowed_file,
+    format_size,
+    get_file_info,
+    format_file_size,
+    get_file_extension,
+    secure_filename,
+    slugify,
+    generate_uuid,
+    time_ago,
+    cleanup_file,
+    get_temp_file,
+    generate_random_string,
+    generate_secure_token
+)
 
-# List of fonts to download
-fonts = [
-    ('Roboto-Regular.ttf', 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf'),
-    ('Roboto-Bold.ttf', 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Bold.ttf'),
-    ('Roboto-Italic.ttf', 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Italic.ttf'),
-    ('OpenSans-Regular.ttf', 'https://github.com/google/fonts/raw/main/apache/opensans/static/OpenSans-Regular.ttf'),
-    ('OpenSans-Bold.ttf', 'https://github.com/google/fonts/raw/main/apache/opensans/static/OpenSans-Bold.ttf'),
-    ('Poppins-Regular.ttf', 'https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf'),
-    ('Poppins-Bold.ttf', 'https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf'),
-    ('Montserrat-Regular.ttf', 'https://github.com/google/fonts/raw/main/ofl/montserrat/static/Montserrat-Regular.ttf'),
-    ('Montserrat-Bold.ttf', 'https://github.com/google/fonts/raw/main/ofl/montserrat/static/Montserrat-Bold.ttf'),
-    ('Lato-Regular.ttf', 'https://github.com/google/fonts/raw/main/ofl/lato/Lato-Regular.ttf'),
-    ('Lato-Bold.ttf', 'https://github.com/google/fonts/raw/main/ofl/lato/Lato-Bold.ttf'),
+from .validators import (
+    is_valid_email,
+    is_valid_username,
+    validate_password_strength,
+    is_valid_url
+)
+
+from .decorators import (
+    require_auth,
+    require_premium,
+    require_admin,
+    rate_limit
+)
+
+from .logger import setup_logger, get_logger, log_error
+
+from .rate_limiter import RateLimiter, rate_limit_ip, rate_limit_user
+
+__all__ = [
+    'allowed_file', 'format_size', 'get_file_info', 'format_file_size',
+    'get_file_extension', 'secure_filename', 'slugify', 'generate_uuid',
+    'time_ago', 'cleanup_file', 'get_temp_file', 'generate_random_string',
+    'generate_secure_token',
+    'is_valid_email', 'is_valid_username', 'validate_password_strength', 'is_valid_url',
+    'require_auth', 'require_premium', 'require_admin', 'rate_limit',
+    'setup_logger', 'get_logger', 'log_error',
+    'RateLimiter', 'rate_limit_ip', 'rate_limit_user'
 ]
-
-print("Downloading fonts...")
-for font_name, url in fonts:
-    try:
-        response = requests.get(url, timeout=10)
-        with open(fonts_dir / font_name, 'wb') as f:
-            f.write(response.content)
-        print(f'  ✓ Downloaded {font_name}')
-    except Exception as e:
-        print(f'  ✗ Failed to download {font_name}: {e}')
-
-print("Font download complete!")
 EOF
+print_status "Created src/utils/__init__.py (CRITICAL FIX!)"
 
-# Run the font download script
-python /tmp/download_fonts.py
-rm /tmp/download_fonts.py
+# Create src/handlers/__init__.py
+cat > src/handlers/__init__.py << 'EOF'
+"""
+Handlers Package - Telegram Bot Handlers
+Author: @kinva_master
+"""
+from .start import StartHandler
+from .video import VideoHandler
+from .image import ImageHandler
+from .design import DesignHandler
+from .premium import PremiumHandler
+from .admin import AdminHandler
+from .callback import CallbackHandler
+from .error import ErrorHandler
 
-print_status "Fonts downloaded"
-
-# ============================================
-# INITIALIZE DATABASE
-# ============================================
-
-echo ""
-print_info "Initializing database..."
-
-# Create database initialization script
-cat > /tmp/init_db.py << 'EOF'
-import sqlite3
-import os
-
-db_path = 'kinva_master.db'
-
-# Remove existing database if it exists
-if os.path.exists(db_path):
-    os.remove(db_path)
-
-conn = sqlite3.connect(db_path)
-cursor = conn.cursor()
-
-# Create users table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        telegram_id INTEGER UNIQUE,
-        username TEXT,
-        first_name TEXT,
-        last_name TEXT,
-        email TEXT UNIQUE,
-        password_hash TEXT,
-        is_premium BOOLEAN DEFAULT 0,
-        premium_until TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-''')
-
-# Create designs table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS designs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        title TEXT,
-        design_data TEXT,
-        thumbnail TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-''')
-
-# Create videos table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS videos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        title TEXT,
-        file_path TEXT,
-        thumbnail TEXT,
-        duration REAL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-''')
-
-# Create images table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS images (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        title TEXT,
-        file_path TEXT,
-        thumbnail TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-''')
-
-# Create payments table
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS payments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        amount REAL,
-        currency TEXT DEFAULT 'USD',
-        payment_id TEXT UNIQUE,
-        status TEXT DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-''')
-
-conn.commit()
-conn.close()
-
-print("Database initialized successfully")
+__all__ = [
+    'StartHandler', 'VideoHandler', 'ImageHandler', 'DesignHandler',
+    'PremiumHandler', 'AdminHandler', 'CallbackHandler', 'ErrorHandler'
+]
 EOF
+print_status "Created src/handlers/__init__.py"
 
-# Run the database initialization script
-python /tmp/init_db.py
-rm /tmp/init_db.py
+# Create src/processors/__init__.py
+cat > src/processors/__init__.py << 'EOF'
+"""
+Processors Package - Video, Image, Audio Processing Modules
+Author: @kinva_master
+"""
+from .video_processor import VideoProcessor, video_processor
+from .image_processor import ImageProcessor, image_processor
+from .audio_processor import AudioProcessor, audio_processor
+from .watermark import Watermark, watermark
+from .compression import CompressionProcessor, compression_processor
+from .effects import EffectsProcessor, effects_processor
+from .filters import FiltersProcessor, filters_processor
 
-print_status "Database initialized"
+__all__ = [
+    'VideoProcessor', 'video_processor',
+    'ImageProcessor', 'image_processor',
+    'AudioProcessor', 'audio_processor',
+    'Watermark', 'watermark',
+    'CompressionProcessor', 'compression_processor',
+    'EffectsProcessor', 'effects_processor',
+    'FiltersProcessor', 'filters_processor'
+]
+EOF
+print_status "Created src/processors/__init__.py"
 
-# ============================================
-# CHECK ENVIRONMENT FILE
-# ============================================
+# Create src/editors/__init__.py
+cat > src/editors/__init__.py << 'EOF'
+"""
+Editors Package - Canva, Video, Image Editors
+Author: @kinva_master
+"""
+from .canva_editor import CanvaEditor, canva_editor
+from .video_editor import VideoEditor, video_editor
+from .image_editor import ImageEditor, image_editor
+from .timeline import Timeline, timeline
+from .layers import LayerManager, layer_manager
 
+__all__ = [
+    'CanvaEditor', 'canva_editor',
+    'VideoEditor', 'video_editor',
+    'ImageEditor', 'image_editor',
+    'Timeline', 'timeline',
+    'LayerManager', 'layer_manager'
+]
+EOF
+print_status "Created src/editors/__init__.py"
+
+# Create src/payment/__init__.py
+cat > src/payment/__init__.py << 'EOF'
+"""
+Payment Package - Payment processing modules
+Author: @kinva_master
+"""
+from .stripe_handler import StripeHandler, stripe_handler
+from .razorpay_handler import RazorpayHandler, razorpay_handler
+from .upi_handler import UPIHandler, upi_handler
+from .crypto_handler import CryptoHandler, crypto_handler
+from .subscription import SubscriptionManager, subscription_manager
+
+__all__ = [
+    'StripeHandler', 'stripe_handler',
+    'RazorpayHandler', 'razorpay_handler',
+    'UPIHandler', 'upi_handler',
+    'CryptoHandler', 'crypto_handler',
+    'SubscriptionManager', 'subscription_manager'
+]
+EOF
+print_status "Created src/payment/__init__.py"
+
+# Create src/api/__init__.py
+cat > src/api/__init__.py << 'EOF'
+"""
+API Package - REST API endpoints
+Author: @kinva_master
+"""
+from .auth import auth_bp
+from .users import users_bp
+from .videos import videos_bp
+from .images import images_bp
+from .designs import designs_bp
+from .payments import payments_bp
+from .templates import templates_bp
+from .admin import admin_bp
+from .webhooks import webhooks_bp
+from .recaptcha import recaptcha_bp
+
+__all__ = [
+    'auth_bp', 'users_bp', 'videos_bp', 'images_bp',
+    'designs_bp', 'payments_bp', 'templates_bp',
+    'admin_bp', 'webhooks_bp', 'recaptcha_bp'
+]
+EOF
+print_status "Created src/api/__init__.py"
+
+# Verify all __init__.py files exist
+print_info "Verifying __init__.py files..."
 echo ""
+ls -la src/__init__.py
+ls -la src/utils/__init__.py
+ls -la src/handlers/__init__.py
+ls -la src/processors/__init__.py
+ls -la src/editors/__init__.py
+ls -la src/payment/__init__.py
+ls -la src/api/__init__.py
+echo ""
+
+print_status "All __init__.py files created successfully"
+
+# ============================================
+# CREATE .env FILE
+# ============================================
 print_info "Checking environment file..."
-
 if [ ! -f ".env" ]; then
-    print_warning ".env file not found"
-    
-    if [ -f ".env.example" ]; then
-        cp .env.example .env
-        print_status ".env file created from .env.example"
-        print_warning "Please edit .env file with your credentials"
-    else
-        print_info "Creating .env file from template..."
-        cat > .env << 'EOF'
+    print_warning ".env file not found. Creating from template..."
+    cat > .env << 'EOF'
 # Telegram API Credentials (from https://my.telegram.org)
 API_ID=1234567
 API_HASH=your_api_hash_here
@@ -362,30 +340,130 @@ WATERMARK_TEXT=@kinva_master.com
 WATERMARK_OPACITY=0.5
 WATERMARK_POSITION=bottom-right
 EOF
-        print_status ".env file created"
-        print_warning "Please edit .env file with your credentials"
-    fi
+    print_status ".env file created"
+    print_warning "Please edit .env file with your credentials"
 else
     print_status ".env file found"
 fi
 
 # ============================================
+# DOWNLOAD BASIC FONTS
+# ============================================
+print_info "Downloading fonts..."
+python -c "
+import os
+import requests
+from pathlib import Path
+
+fonts_dir = Path('fonts')
+fonts_dir.mkdir(exist_ok=True)
+
+fonts = [
+    ('Roboto-Regular.ttf', 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Regular.ttf'),
+    ('Roboto-Bold.ttf', 'https://github.com/google/fonts/raw/main/apache/roboto/static/Roboto-Bold.ttf'),
+    ('OpenSans-Regular.ttf', 'https://github.com/google/fonts/raw/main/apache/opensans/static/OpenSans-Regular.ttf'),
+    ('OpenSans-Bold.ttf', 'https://github.com/google/fonts/raw/main/apache/opensans/static/OpenSans-Bold.ttf'),
+    ('Poppins-Regular.ttf', 'https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Regular.ttf'),
+    ('Poppins-Bold.ttf', 'https://github.com/google/fonts/raw/main/ofl/poppins/Poppins-Bold.ttf'),
+]
+
+for font_name, url in fonts:
+    try:
+        response = requests.get(url, timeout=10)
+        with open(fonts_dir / font_name, 'wb') as f:
+            f.write(response.content)
+        print(f'✅ Downloaded {font_name}')
+    except Exception as e:
+        print(f'❌ Failed to download {font_name}: {e}')
+"
+print_status "Fonts downloaded"
+
+# ============================================
+# INITIALIZE DATABASE
+# ============================================
+print_info "Initializing database..."
+python -c "
+import sqlite3
+conn = sqlite3.connect('kinva_master.db')
+cursor = conn.cursor()
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        telegram_id INTEGER UNIQUE,
+        username TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        email TEXT UNIQUE,
+        password_hash TEXT,
+        is_premium BOOLEAN DEFAULT 0,
+        premium_until TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS designs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT,
+        design_data TEXT,
+        thumbnail TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS videos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT,
+        file_path TEXT,
+        thumbnail TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT,
+        file_path TEXT,
+        thumbnail TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS payments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        amount REAL,
+        payment_id TEXT UNIQUE,
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+''')
+
+conn.commit()
+conn.close()
+print('✅ Database initialized')
+"
+print_status "Database initialized"
+
+# ============================================
 # CREATE LOG FILES
 # ============================================
-
-echo ""
 print_info "Creating log files..."
-
 touch logs/app.log
 touch logs/bot.log
 touch logs/error.log
-
 print_status "Log files created"
 
 # ============================================
 # SETUP COMPLETE
 # ============================================
-
 echo ""
 echo "=========================================="
 echo -e "${GREEN}✅ Setup Complete!${NC}"
@@ -406,9 +484,9 @@ echo "4. Run the Telegram bot (in another terminal):"
 echo "   python src/bot.py"
 echo ""
 echo "5. Open your browser:"
-echo "   http://Kinv-master.com"
+echo "   http://localhost:5000"
 echo ""
-echo "📊 Default admin (if using email login):"
+echo "📊 Default admin:"
 echo "   Username: admin"
 echo "   Password: admin123"
 echo ""
