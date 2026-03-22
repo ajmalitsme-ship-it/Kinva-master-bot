@@ -1,5 +1,5 @@
 """
-Utils Package - Utility functions and helpers
+Utils Package - Complete exports
 Author: @kinva_master
 """
 
@@ -12,6 +12,8 @@ from .helpers import (
     get_mime_type, is_image_file, is_video_file, is_audio_file,
     secure_filename, generate_unique_filename, get_temp_file, cleanup_file,
     allowed_file, get_file_info,
+    # Video info (CRITICAL!)
+    get_video_info,
     # Date time utilities
     get_current_timestamp, format_datetime, parse_datetime, time_ago,
     get_date_range, is_within_last_hours,
@@ -32,6 +34,8 @@ __all__ = [
     'get_mime_type', 'is_image_file', 'is_video_file', 'is_audio_file',
     'secure_filename', 'generate_unique_filename', 'get_temp_file', 'cleanup_file',
     'allowed_file', 'get_file_info',
+    # Video info
+    'get_video_info',
     # Date time utilities
     'get_current_timestamp', 'format_datetime', 'parse_datetime', 'time_ago',
     'get_date_range', 'is_within_last_hours',
