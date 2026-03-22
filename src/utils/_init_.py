@@ -1,48 +1,89 @@
 """
-Utils Package - Complete exports
-Author: @kinva_master
+Utils Package - Helper functions for Kinva Master
 """
 
+# Import from helpers
 from .helpers import (
-    # String utilities
-    generate_random_string, generate_secure_token, generate_uuid,
-    slugify, truncate_text, capitalize_words, extract_emails, extract_urls,
-    # File utilities
-    format_file_size, format_size, get_file_extension, get_file_size,
-    get_mime_type, is_image_file, is_video_file, is_audio_file,
-    secure_filename, generate_unique_filename, get_temp_file, cleanup_file,
-    allowed_file, get_file_info,
-    # Video info (CRITICAL!)
+    # Video utilities
     get_video_info,
-    # Date time utilities
-    get_current_timestamp, format_datetime, parse_datetime, time_ago,
-    get_date_range, is_within_last_hours,
-    # Dictionary utilities
-    deep_merge, filter_dict, exclude_keys,
-    # JSON utilities
-    json_serialize, json_deserialize, safe_json_loads,
-    # Context manager
-    TemporaryDirectory
+    cleanup_file,
+    TemporaryDirectory,
+    format_file_size,
+    format_file_size as format_size,
+    
+    # File utilities
+    get_file_extension,
+    get_file_size,
+    get_file_info,
+    secure_filename,
+    allowed_file,
+    
+    # String utilities
+    slugify,
+    generate_uuid,
+    time_ago,
 )
 
+# Import from decorators
+from .decorators import (
+    require_auth,
+    require_premium,
+    require_admin,
+    rate_limit,
+)
+
+# Import from logger
+from .logger import setup_logger, get_logger, log_error
+
+# Import from rate_limiter
+from .rate_limiter import RateLimiter, rate_limit_ip, rate_limit_user
+
+# Import from validators
+from .validators import (
+    is_valid_email,
+    is_valid_username,
+    validate_password_strength,
+)
+
+# Export all
 __all__ = [
-    # String utilities
-    'generate_random_string', 'generate_secure_token', 'generate_uuid',
-    'slugify', 'truncate_text', 'capitalize_words', 'extract_emails', 'extract_urls',
-    # File utilities
-    'format_file_size', 'format_size', 'get_file_extension', 'get_file_size',
-    'get_mime_type', 'is_image_file', 'is_video_file', 'is_audio_file',
-    'secure_filename', 'generate_unique_filename', 'get_temp_file', 'cleanup_file',
-    'allowed_file', 'get_file_info',
-    # Video info
+    # Video utilities
     'get_video_info',
-    # Date time utilities
-    'get_current_timestamp', 'format_datetime', 'parse_datetime', 'time_ago',
-    'get_date_range', 'is_within_last_hours',
-    # Dictionary utilities
-    'deep_merge', 'filter_dict', 'exclude_keys',
-    # JSON utilities
-    'json_serialize', 'json_deserialize', 'safe_json_loads',
-    # Context manager
-    'TemporaryDirectory'
+    'cleanup_file',
+    'TemporaryDirectory',
+    'format_file_size',
+    'format_size',
+    
+    # File utilities
+    'get_file_extension',
+    'get_file_size',
+    'get_file_info',
+    'secure_filename',
+    'allowed_file',
+    
+    # String utilities
+    'slugify',
+    'generate_uuid',
+    'time_ago',
+    
+    # Decorators
+    'require_auth',
+    'require_premium',
+    'require_admin',
+    'rate_limit',
+    
+    # Logger
+    'setup_logger',
+    'get_logger',
+    'log_error',
+    
+    # Rate limiter
+    'RateLimiter',
+    'rate_limit_ip',
+    'rate_limit_user',
+    
+    # Validators
+    'is_valid_email',
+    'is_valid_username',
+    'validate_password_strength',
 ]
