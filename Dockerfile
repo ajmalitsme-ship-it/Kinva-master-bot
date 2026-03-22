@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-COPY .auto_ai_fix.py
+COPY .auto_fix_ai.py
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
