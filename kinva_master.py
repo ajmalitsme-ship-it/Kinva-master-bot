@@ -3934,275 +3934,195 @@ class UltimateWebApplication:
             </body>
             </html>
             """)
-        
-        @self.app.get("/admin")
-        async def admin_panel(request: Request):
-            """Admin dashboard"""
-            stats = await self.db.get_stats()
-            
-            return HTMLResponse(f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Kinva Master Ultimate - Admin Panel</title>
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                <style>
-                    * {{
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }}
-                    
-                    body {{
-                        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-                        background: #1a1a2e;
-                        color: white;
-                    }}
-                    
-                    .container {{
-                        max-width: 1200px;
-                        margin: 0 auto;
-                        padding: 20px;
-                    }}
-                    
-                    .header {{
-                        background: linear-gradient(135deg, #667eea, #764ba2);
-                        padding: 30px;
-                        border-radius: 20px;
-                        margin-bottom: 30px;
-                    }}
-                    
-                    .stats-grid {{
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                        gap: 20px;
-                        margin-bottom: 30px;
-                    }}
-                    
-                    .stat-card {{
-                        background: #16213e;
-                        padding: 20px;
-                        border-radius: 15px;
-                        text-align: center;
-                    }}
-                    
-                    .stat-number {{
-                        font-size: 36px;
-                        font-weight: bold;
-                        color: #e94560;
-                        margin-bottom: 10px;
-                    }}
-                    
-                    .stat-label {{
-                        color: #888;
-                        font-size: 14px;
-                    }}
-                    
-                    .section {{
-                        background: #16213e;
-                        padding: 20px;
-                        border-radius: 15px;
-                        margin-bottom: 20px;
-                    }}
-                    
-                    .section-title {{
-                        font-size: 20px;
-                        margin-bottom: 20px;
-                        color: #e94560;
-                    }}
-                    
-                    table {{
-                        width: 100%;
-                        border-collapse: collapse;
-                    }}
-                    
-                    th, td {{
-                        padding: 12px;
-                        text-align: left;
-                        border-bottom: 1px solid #0f3460;
-                    }}
-                    
-                    th {{
-                        color: #e94560;
-                    }}
-                    
-                    .btn {{
-                        background: #e94560;
-                        border: none;
-                        color: white;
-                        padding: 8px 16px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        margin-right: 10px;
-                    }}
-                    
-                    .btn:hover {{
-                        background: #ff6b6b;
-                    }}
-                    
-                    .btn-primary {{
-                        background: linear-gradient(135deg, #f093fb, #f5576c);
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h1>🎛️ Kinva Master Ultimate - Admin Panel</h1>
-                        <p>Manage users, monitor stats, and control the platform</p>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">{stats['total_users']}</div>
-                            <div class="stat-label">Total Users</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">{stats['premium_users']}</div>
-                            <div class="stat-label">Premium Users</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">{stats['total_projects']}</div>
-                            <div class="stat-label">Total Projects</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${stats['total_revenue']:.2f}</div>
-                            <div class="stat-label">Total Revenue</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">{stats['active_today']}</div>
-                            <div class="stat-label">Active Today</div>
-                        </div>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">📊 Quick Actions</div>
-                        <button class="btn btn-primary" onclick="location.href='/admin/users'">View All Users</button>
-                        <button class="btn" onclick="location.href='/admin/payments'">View Payments</button>
-                        <button class="btn" onclick="location.href='/admin/templates'">Manage Templates</button>
-                        <button class="btn" onclick="location.href='/admin/analytics'">Analytics</button>
-                        <button class="btn" onclick="location.href='/admin/settings'">Settings</button>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">📈 System Status</div>
-                        <p>✅ Bot Status: Online</p>
-                        <p>✅ Database: Connected</p>
-                        <p>✅ Redis: Connected</p>
-                        <p>✅ MongoDB: Connected</p>
-                        <p>✅ Elasticsearch: Connected</p>
-                        <p>✅ FFmpeg: Available</p>
-                        <p>✅ AI Models: Loaded</p>
-                    </div>
-                    
-                    <div class="section">
-                        <div class="section-title">🎬 Recent Activity</div>
-                        <table id="activityTable">
-                            <thead>
-                                <tr><th>User</th><th>Action</th><th>Time</th></tr>
-                            </thead>
-                            <tbody id="activityList"></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <script>
-                    // Fetch recent activity
-                    fetch('/api/activity')
-                        .then(r => r.json())
-                        .then(activities => {{
-                            const tbody = document.getElementById('activityList');
-                            activities.forEach(activity => {{
-                                tbody.innerHTML += `
-                                    <tr>
-                                        <td>{activity.user}</td>
-                                        <td>{activity.action}</td>
-                                        <td>{new Date(activity.time).toLocaleString()}</td>
-                                    </tr>
-                                `;
-                            }});
-                        }});
-                </script>
-            </body>
-            </html>
-            """)
-        
-        @self.app.get("/api/activity")
-        async def api_activity():
-            """Get recent activity"""
-            # This would fetch from database
-            return JSONResponse([
-                {"user": "user1", "action": "Created video", "time": datetime.datetime.now().isoformat()},
-                {"user": "user2", "action": "Upgraded to Premium", "time": datetime.datetime.now().isoformat()},
-                {"user": "user3", "action": "Exported design", "time": datetime.datetime.now().isoformat()},
-            ])
-        
-        @self.app.get("/api/stats")
-        async def api_stats():
-            """Get API stats"""
-            stats = await self.db.get_stats()
-            return JSONResponse(stats)
-        
-        @self.app.post("/api/upload")
-        async def api_upload(file: UploadFile = File(...)):
-            """Upload file"""
-            file_path = settings.UPLOAD_DIR / "temp" / f"{uuid.uuid4()}_{file.filename}"
-            content = await file.read()
-            async with aiofiles.open(file_path, 'wb') as f:
-                await f.write(content)
-            return JSONResponse({
-                "success": True,
-                "file_id": str(file_path),
-                "filename": file.filename,
-                "url": f"/uploads/{file_path.name}"
-            })
-        
-        @self.app.get("/api/design/{design_id}")
-        async def api_get_design(design_id: str):
-            """Get design by ID"""
-            design = await self.db.get_design(design_id)
-            if design:
-                return JSONResponse(design)
-            return JSONResponse({"error": "Design not found"}, status_code=404)
-        
-        @self.app.post("/api/design")
-        async def api_create_design(request: Request):
-            """Create new design"""
-            data = await request.json()
-            user_id = data.get("user_id", 1)  # TODO: Get from auth
-            name = data.get("name", "Untitled")
-            dimensions = data.get("dimensions", {"width": 1080, "height": 1080})
-            canvas_data = data.get("canvas_data", {})
-            
-            design_id = await self.db.add_design(user_id, name, dimensions, canvas_data)
-            
-            return JSONResponse({
-                "success": True,
-                "design_id": design_id,
-                "url": f"/editor?design={design_id}"
-            })
-        
-        @self.app.websocket("/ws/editor/{design_id}")
-        async def websocket_editor(websocket: WebSocket, design_id: str):
-            """WebSocket for real-time collaboration"""
-            await websocket.accept()
-            
-            try:
-                while True:
-                    data = await websocket.receive_json()
-                    
-                    # Update design
-                    await self.db.update_design(design_id, canvas_data=data.get("canvas_data"))
-                    
-                    # Broadcast to other clients
-                    await websocket.send_json({
-                        "type": "update",
-                        "data": data
-                    })
-                    
-            except WebSocketDisconnect:
-                log.info(f"Client disconnected from design {design_id}")
+        # In your routes, use HTMLResponse with triple quotes properly
+@self.app.get("/admin")
+async def admin_panel(request: Request):
+    """Admin dashboard"""
+    stats = await self.db.get_stats()
     
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Kinva Master Ultimate - Admin Panel</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; color: white; }
+            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea, #764ba2); padding: 30px; border-radius: 20px; margin-bottom: 30px; }
+            .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+            .stat-card { background: #16213e; padding: 20px; border-radius: 15px; text-align: center; }
+            .stat-number { font-size: 36px; font-weight: bold; color: #e94560; margin-bottom: 10px; }
+            .stat-label { color: #888; font-size: 14px; }
+            .section { background: #16213e; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+            .section-title { font-size: 20px; margin-bottom: 20px; color: #e94560; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #0f3460; }
+            th { color: #e94560; }
+            .btn { background: #e94560; border: none; color: white; padding: 8px 16px; border-radius: 8px; cursor: pointer; margin-right: 10px; }
+            .btn:hover { background: #ff6b6b; }
+            .btn-primary { background: linear-gradient(135deg, #f093fb, #f5576c); }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🎛️ Kinva Master Ultimate - Admin Panel</h1>
+                <p>Manage users, monitor stats, and control the platform</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{total_users}</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{premium_users}</div>
+                    <div class="stat-label">Premium Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{total_projects}</div>
+                    <div class="stat-label">Total Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${total_revenue:.2f}</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{active_today}</div>
+                    <div class="stat-label">Active Today</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📊 Quick Actions</div>
+                <button class="btn btn-primary" onclick="location.href='/admin/users'">View All Users</button>
+                <button class="btn" onclick="location.href='/admin/payments'">View Payments</button>
+                <button class="btn" onclick="location.href='/admin/templates'">Manage Templates</button>
+                <button class="btn" onclick="location.href='/admin/analytics'">Analytics</button>
+                <button class="btn" onclick="location.href='/admin/settings'">Settings</button>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📈 System Status</div>
+                <p>✅ Bot Status: Online</p>
+                <p>✅ Database: Connected</p>
+                <p>✅ Redis: Connected</p>
+                <p>✅ MongoDB: Connected</p>
+                <p>✅ Elasticsearch: Connected</p>
+                <p>✅ FFmpeg: Available</p>
+                <p>✅ AI Models: Loaded</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">🎬 Recent Activity</div>
+                <table>
+                    <thead>
+                        <tr><th>User</th><th>Action</th><th>Time</th></tr>
+                    </thead>
+                    <tbody id="activityList"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <script>
+            fetch('/api/activity')
+                .then(r => r.json())
+                .then(activities => {
+                    const tbody = document.getElementById('activityList');
+                    activities.forEach(activity => {
+                        tbody.innerHTML += `<tr><td>${activity.user}</td><td>${activity.action}</td><td>${new Date(activity.time).toLocaleString()}</td></tr>`;
+                    });
+                });
+        </script>
+    </body>
+    </html>
+    """
+    
+    # Use format to insert variables properly
+    return HTMLResponse(html_content.format(
+        total_users=stats['total_users'],
+        premium_users=stats['premium_users'],
+        total_projects=stats['total_projects'],
+        total_revenue=stats['total_revenue'],
+        active_today=stats['active_today']
+    ))
+        @self.app.get("/api/activity")
+async def api_activity():
+    """Get recent activity"""
+    # This would fetch from database
+    return JSONResponse([
+        {"user": "user1", "action": "Created video", "time": datetime.datetime.now().isoformat()},
+        {"user": "user2", "action": "Upgraded to Premium", "time": datetime.datetime.now().isoformat()},
+        {"user": "user3", "action": "Exported design", "time": datetime.datetime.now().isoformat()},
+    ])
+
+@self.app.get("/api/stats")
+async def api_stats():
+    """Get API stats"""
+    stats = await self.db.get_stats()
+    return JSONResponse(stats)
+
+@self.app.post("/api/upload")
+async def api_upload(file: UploadFile = File(...)):
+    """Upload file"""
+    file_path = settings.UPLOAD_DIR / "temp" / f"{uuid.uuid4()}_{file.filename}"
+    content = await file.read()
+    async with aiofiles.open(file_path, 'wb') as f:
+        await f.write(content)
+    return JSONResponse({
+        "success": True,
+        "file_id": str(file_path),
+        "filename": file.filename,
+        "url": f"/uploads/{file_path.name}"
+    })
+
+@self.app.get("/api/design/{design_id}")
+async def api_get_design(design_id: str):
+    """Get design by ID"""
+    design = await self.db.get_design(design_id)
+    if design:
+        return JSONResponse(design)
+    return JSONResponse({"error": "Design not found"}, status_code=404)
+
+@self.app.post("/api/design")
+async def api_create_design(request: Request):
+    """Create new design"""
+    data = await request.json()
+    user_id = data.get("user_id", 1)  # TODO: Get from auth
+    name = data.get("name", "Untitled")
+    dimensions = data.get("dimensions", {"width": 1080, "height": 1080})
+    canvas_data = data.get("canvas_data", {})
+    
+    design_id = await self.db.add_design(user_id, name, dimensions, canvas_data)
+    
+    return JSONResponse({
+        "success": True,
+        "design_id": design_id,
+        "url": f"/editor?design={design_id}"
+    })
+
+@self.app.websocket("/ws/editor/{design_id}")
+async def websocket_editor(websocket: WebSocket, design_id: str):
+    """WebSocket for real-time collaboration"""
+    await websocket.accept()
+    
+    try:
+        while True:
+            data = await websocket.receive_json()
+            
+            # Update design
+            await self.db.update_design(design_id, canvas_data=data.get("canvas_data"))
+            
+            # Broadcast to other clients
+            await websocket.send_json({
+                "type": "update",
+                "data": data
+            })
+            
+    except WebSocketDisconnect:
+        log.info(f"Client disconnected from design {design_id}")
     async def run(self):
         """Run the web server"""
         config = uvicorn.Config(self.app, host="0.0.0.0", port=8000, log_level="info")
