@@ -1,89 +1,55 @@
+cat > src/utils/__init__.py << 'EOF'
 """
 Utils Package - Helper functions for Kinva Master
 """
 
-# Import from helpers
+# Import ALL needed functions from helpers
 from .helpers import (
-    # Video utilities
     get_video_info,
     cleanup_file,
     TemporaryDirectory,
     format_file_size,
     format_file_size as format_size,
-    
-    # File utilities
     get_file_extension,
     get_file_size,
     get_file_info,
     secure_filename,
     allowed_file,
-    
-    # String utilities
     slugify,
     generate_uuid,
     time_ago,
 )
 
-# Import from decorators
-from .decorators import (
-    require_auth,
-    require_premium,
-    require_admin,
-    rate_limit,
-)
+# Import from decorators (optional - remove if not needed)
+try:
+    from .decorators import require_auth, require_premium, require_admin, rate_limit
+except ImportError:
+    require_auth = require_premium = require_admin = rate_limit = None
 
-# Import from logger
-from .logger import setup_logger, get_logger, log_error
+# Import from logger (optional - remove if not needed)
+try:
+    from .logger import setup_logger, get_logger, log_error
+except ImportError:
+    setup_logger = get_logger = log_error = None
 
-# Import from rate_limiter
-from .rate_limiter import RateLimiter, rate_limit_ip, rate_limit_user
+# Import from rate_limiter (optional - remove if not needed)
+try:
+    from .rate_limiter import RateLimiter, rate_limit_ip, rate_limit_user
+except ImportError:
+    RateLimiter = rate_limit_ip = rate_limit_user = None
 
-# Import from validators
-from .validators import (
-    is_valid_email,
-    is_valid_username,
-    validate_password_strength,
-)
+# Import from validators (optional - remove if not needed)
+try:
+    from .validators import is_valid_email, is_valid_username, validate_password_strength
+except ImportError:
+    is_valid_email = is_valid_username = validate_password_strength = None
 
-# Export all
+# Export only what's needed for video_processor
 __all__ = [
-    # Video utilities
     'get_video_info',
     'cleanup_file',
     'TemporaryDirectory',
     'format_file_size',
     'format_size',
-    
-    # File utilities
-    'get_file_extension',
-    'get_file_size',
-    'get_file_info',
-    'secure_filename',
-    'allowed_file',
-    
-    # String utilities
-    'slugify',
-    'generate_uuid',
-    'time_ago',
-    
-    # Decorators
-    'require_auth',
-    'require_premium',
-    'require_admin',
-    'rate_limit',
-    
-    # Logger
-    'setup_logger',
-    'get_logger',
-    'log_error',
-    
-    # Rate limiter
-    'RateLimiter',
-    'rate_limit_ip',
-    'rate_limit_user',
-    
-    # Validators
-    'is_valid_email',
-    'is_valid_username',
-    'validate_password_strength',
 ]
+EOF
