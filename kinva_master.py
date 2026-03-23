@@ -3013,11 +3013,6 @@ class UltimateWebApplication:
         async def stats():
             return JSONResponse({"message": "Stats endpoint"})
         
-        @self.app.get("/api/activity")
-        async def api_activity():
-            return JSONResponse([
-                {"user": "user1", "action": "Created video", "time": datetime.now().isoformat()}
-            ])
         @self.app.get("/")
         async def index(request: Request):
             """Landing page"""
