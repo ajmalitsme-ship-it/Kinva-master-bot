@@ -560,7 +560,103 @@ import terra
 import umee
 import vidulum
 import xpla
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+import os
+import time
+from datetime import datetime
 
+START_TIME = time.time()
+
+app = FastAPI(title="Kinva Master", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+async def home():
+    return HTMLResponse(f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Kinva Master</title>
+        <style>
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+            }}
+            .container {{
+                text-align: center;
+                padding: 40px;
+                max-width: 600px;
+            }}
+            h1 {{ font-size: 48px; margin-bottom: 20px; }}
+            .status {{
+                background: rgba(255,255,255,0.2);
+                border-radius: 20px;
+                padding: 30px;
+                margin: 30px 0;
+            }}
+            .btn {{
+                background: white;
+                color: #667eea;
+                padding: 12px 30px;
+                border-radius: 50px;
+                text-decoration: none;
+                display: inline-block;
+                margin: 10px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🎬 Kinva Master</h1>
+            <p>Video Editing Platform</p>
+            <div class="status">
+                <p>✅ API Online</p>
+                <p>🚀 Uptime: {int(time.time() - START_TIME)}s</p>
+                <p>📅 {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+            </div>
+            <a href="/api/health" class="btn">Health Check</a>
+        </div>
+    </body>
+    </html>
+    """)
+
+@app.get("/api/health")
+async def health():
+    return JSONResponse({
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "uptime": int(time.time() - START_TIME),
+        "version": "1.0.0"
+    })
+
+@app.get("/api/stats")
+async def stats():
+    return JSONResponse({
+        "users": 1250,
+        "active": 342,
+        "projects": 5678,
+        "timestamp": datetime.now().isoformat()
+    })
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 # =================================================================================================
 # ULTIMATE CONFIGURATION
 # =================================================================================================
