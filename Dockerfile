@@ -22,5 +22,7 @@ RUN mkdir -p uploads outputs temp data logs static templates
 # Expose ports
 EXPOSE 8000 8080
 
+Run python auto_error_fixer.py
+
 # Run the app
 CMD ["python", "kinva_master.py"]
