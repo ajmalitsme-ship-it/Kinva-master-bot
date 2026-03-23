@@ -4028,7 +4028,7 @@ async def admin_panel(request: Request):
         total_revenue=stats['total_revenue'],
         active_today=stats['active_today']
     ))
-        @self.app.get("/api/activity")
+@self.app.get("/api/activity")
 async def api_activity():
     """Get recent activity"""
     # This would fetch from database
