@@ -1,26 +1,32 @@
-# Kinva Master - Dockerfile
-FROM python:3.11-slim
+FROM python:3.9-slim
 
-# Install system dependencies (FFmpeg for video processing)
-
-# Set working directory
 WORKDIR /app
 
-# Copy requirements first (better caching)
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgomp1 \
+    libgl1-mesa-glx \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application
 COPY . .
 
-Run python auto_alive.py
-# Create directories
-RUN mkdir -p uploads outputs temp data logs static templates
+# Create necessary directories
+RUN mkdir -p temp uploads outputs logs static/css static/js
 
-# Expose ports
-EXPOSE 8000 8080
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
 
-Run python auto_error_fixer.py
+# Expose port
+EXPOSE 5000
 
-# Run the app
-CMD ["python", "kinva_master.py"]
+# Run the application
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "web_app:app"]
