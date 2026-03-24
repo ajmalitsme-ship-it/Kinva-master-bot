@@ -1,0 +1,91 @@
+# render.yaml - Render Blueprint Configuration
+services:
+  # Telegram Bot Service
+  - type: worker
+    name: kinva-master-bot
+    runtime: python
+    repo: https://github.com/yourusername/kinva-master-bot
+    plan: starter
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: python run.py --mode bot
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: MONGODB_URI
+        fromDatabase:
+          name: kinva-mongodb
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: kinva-redis
+          property: connectionString
+      - key: WEB_APP_URL
+        fromService:
+          type: web
+          name: kinva-web
+          property: url
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PREMIUM_CONTACT
+        value: @funnytamilan
+      - key: UPI_ID
+        value: funnytamilan@okhdfcbank
+      - key: LOG_LEVEL
+        value: INFO
+
+  # Web Application Service
+  - type: web
+    name: kinva-web
+    runtime: python
+    repo: https://github.com/yourusername/kinva-master-bot
+    plan: starter
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --worker-class eventlet -w 1 web_app:app
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: MONGODB_URI
+        fromDatabase:
+          name: kinva-mongodb
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: kinva-redis
+          property: connectionString
+      - key: WEB_APP_URL
+        fromService:
+          type: web
+          name: kinva-web
+          property: url
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PREMIUM_CONTACT
+        value: @funnytamilan
+      - key: UPI_ID
+        value: funnytamilan@okhdfcbank
+      - key: LOG_LEVEL
+        value: INFO
+
+  # Redis Cache
+  - type: redis
+    name: kinva-redis
+    plan: starter
+    region: oregon
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
+
+databases:
+  # MongoDB Database
+  - name: kinva-mongodb
+    plan: starter
+    region: oregon
+    databaseName: kinva_master
+    ipAllowList: []
