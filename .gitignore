@@ -1,3 +1,9 @@
+# ============================================
+# Kinva Master Bot - Git Ignore File
+# Author: @funnytamilan
+# Version: 3.0
+# ============================================
+
 # Python
 __pycache__/
 *.py[cod]
@@ -22,11 +28,13 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Environment
 .env
 .env.local
 .env.production
+.env.development
 
 # Database
 *.db
@@ -38,13 +46,21 @@ logs/
 *.log
 bot.log
 error.log
+admin.log
+payment.log
+access.log
+performance.log
 
 # Temporary files
 temp/
+temp/*
 uploads/
+uploads/*
 outputs/
+outputs/*
 *.tmp
 *.temp
+*.cache
 
 # IDE
 .vscode/
@@ -53,14 +69,22 @@ outputs/
 *.swo
 *~
 .DS_Store
+Thumbs.db
+desktop.ini
 
 # OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-Desktop.ini
 
 # Flask
 instance/
 .webassets-cache
+.env
 
 # Docker
 .dockerignore
@@ -80,10 +104,18 @@ coverage.xml
 # Uploads
 uploads/*
 !uploads/.gitkeep
+
+# Outputs
 outputs/*
 !outputs/.gitkeep
+
+# Temp
 temp/*
 !temp/.gitkeep
+
+# Logs
+logs/*
+!logs/.gitkeep
 
 # Static files
 static/css/*
@@ -99,3 +131,24 @@ templates/*
 *.key
 *.pem
 *.crt
+*.p12
+secrets/
+config.local.py
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Python tools
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Render
+.render/
