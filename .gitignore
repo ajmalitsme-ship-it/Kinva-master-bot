@@ -37,6 +37,7 @@ wheels/
 logs/
 *.log
 bot.log
+error.log
 
 # Temporary files
 temp/
@@ -83,3 +84,18 @@ outputs/*
 !outputs/.gitkeep
 temp/*
 !temp/.gitkeep
+
+# Static files
+static/css/*
+!static/css/.gitkeep
+static/js/*
+!static/js/.gitkeep
+
+# Templates
+templates/*
+!templates/.gitkeep
+
+# Secrets
+*.key
+*.pem
+*.crt
