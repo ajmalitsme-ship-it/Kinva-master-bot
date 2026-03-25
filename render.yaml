@@ -2,7 +2,7 @@ services:
   - type: web
     name: kinva-master
     runtime: python
-    plan: starter
+    plan: free
     region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn --worker-class eventlet -w 1 web_app:app
