@@ -15,19 +15,19 @@ class Config:
     """Main configuration class for Kinva Master Bot"""
     
     # ============= BOT CONFIGURATION =============
-    BOT_TOKEN = os.getenv('BOT_TOKEN', 'YOUR_BOT_TOKEN_HERE')
-    ADMIN_IDS = [int(id.strip()) for id in os.getenv('ADMIN_IDS', '123456789,987654321').split(',')]
+    BOT_TOKEN = os.getenv('BOT_TOKEN', '8776043562:AAHLiV5VKyUXvhscNJ6FZZ2YLlqYiag_tHc')
+    ADMIN_IDS = [int(id.strip()) for id in os.getenv('ADMIN_IDS', '8525952693').split(',')]
     
     # ============= WEB APP CONFIGURATION =============
-    WEB_APP_URL = os.getenv('WEB_APP_URL', 'https://your-domain.com')
+    WEB_APP_URL = os.getenv('WEB_APP_URL', 'https://kinva-master-bot.onrender.com')
     WEB_APP_PORT = int(os.getenv('PORT', 5000))
     WEB_APP_HOST = os.getenv('HOST', '0.0.0.0')
     SECRET_KEY = os.getenv('SECRET_KEY', 'kinva-master-secret-key-2024')
     
     # ============= DATABASE CONFIGURATION =============
-    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
+    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://Bosshub:JMaff0WvazwNxKky@cluster0.l0xcoc1.mongodb.net/?appName=Cluster0')
     DATABASE_NAME = os.getenv('DATABASE_NAME', 'kinva_master')
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+    REDIS_URL = os.getenv('REDIS_URL', 'kinva-master-bot.onrender.com')
     
     # ============= PREMIUM SETTINGS =============
     TRIAL_DAYS = 60  # 2 months free trial
