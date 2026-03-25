@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Kinva Master - Professional Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .navbar-brand i {
+            background: none;
+            -webkit-text-fill-color: #ffd700;
+        }
+        
+        .editor-container {
+            display: flex;
+            height: calc(100vh - 80px);
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .preview-panel {
+            flex: 2;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .preview-area {
+            flex: 1;
+            background: #0a0a1a;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(255,215,0,0.3);
+        }
+        
+        .preview-image, .preview-video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .controls-panel {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        
+        .controls-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .controls-panel::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+        
+        .controls-panel::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .upload-area:hover {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+            transform: scale(1.02);
+        }
+        
+        .upload-area i {
+            font-size: 48px;
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-outline-gold {
+            background: transparent;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+        }
+        
+        .btn-outline-gold:hover {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+        
+        .effect-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .effect-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .effect-card:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-3px);
+            border-color: #ffd700;
+        }
+        
+        .effect-card.active {
+            background: #ffd700;
+            color: #1a1a2e;
+            border-color: #ffd700;
+        }
+        
+        .effect-card i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .effect-card span {
+            font-size: 12px;
+        }
+        
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .quality-selector {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+        
+        .quality-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            margin: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+        
+        .quality-badge:hover, .quality-badge.active {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255,215,0,0.3);
+        }
+        
+        .range-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .value-display {
+            display: inline-block;
+            margin-left: 10px;
+            color: #ffd700;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px;
+            }
+            
+            .preview-panel, .controls-panel {
+                min-height: 400px;
+            }
+            
+            .effect-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand">
+                <i class="fas fa-crown"></i> Kinva<span style="color:#ffd700">Master</span>
+            </span>
+            <div class="d-flex gap-2">
+                <button class="btn btn-custom" onclick="openLiveStream()">
+                    <i class="fas fa-video"></i> Live Stream
+                </button>
+                <button class="btn btn-custom btn-outline-gold" onclick="exportFile()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Editor Container -->
+    <div class="editor-container">
+        <!-- Preview Panel -->
+        <div class="preview-panel">
+            <h4 style="color: white; margin-bottom: 15px;">
+                <i class="fas fa-eye"></i> Preview
+            </h4>
+            <div class="preview-area" id="previewArea">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p style="margin-top: 10px;">Click to upload image or video</p>
+                    <p style="font-size: 12px; opacity: 0.7; margin-top: 5px;">
+                        <i class="fas fa-image"></i> JPG, PNG, GIF | 
+                        <i class="fas fa-video"></i> MP4, MOV, AVI
+                    </p>
+                </div>
+                <img id="previewImage" class="preview-image" style="display: none;">
+                <video id="previewVideo" class="preview-video" style="display: none;" controls></video>
+            </div>
+            
+            <!-- Quality Selector -->
+            <div class="quality-selector mt-3" id="qualitySelector" style="display: none;">
+                <small class="text-muted">Export Quality</small>
+                <div id="qualityOptions"></div>
+            </div>
+        </div>
+        
+        <!-- Controls Panel -->
+        <div class="controls-panel">
+            <h4 style="color: white; margin-bottom: 15px;">
+                <i class="fas fa-sliders-h"></i> Editing Tools
+            </h4>
+            
+            <!-- Tab Buttons -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('filters')">
+                    <i class="fas fa-filter"></i> Filters
+                </button>
+                <button class="tab-btn" onclick="switchTab('effects')">
+                    <i class="fas fa-magic"></i> Effects
+                </button>
+                <button class="tab-btn" onclick="switchTab('adjust')">
+                    <i class="fas fa-adjust"></i> Adjust
+                </button>
+                <button class="tab-btn" onclick="switchTab('tools')">
+                    <i class="fas fa-tools"></i> Tools
+                </button>
+            </div>
+            
+            <!-- Filters Tab -->
+            <div id="filtersTab" class="tab-content">
+                <div class="effect-grid">
+                    <div class="effect-card" onclick="applyFilter('vintage')">
+                        <i class="fas fa-camera-retro"></i>
+                        <span>Vintage</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('cinematic')">
+                        <i class="fas fa-film"></i>
+                        <span>Cinematic</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('black_white')">
+                        <i class="fas fa-adjust"></i>
+                        <span>B&W</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('sepia')">
+                        <i class="fas fa-leaf"></i>
+                        <span>Sepia</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('blur')">
+                        <i class="fas fa-tint"></i>
+                        <span>Blur</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('sharpen')">
+                        <i class="fas fa-eye"></i>
+                        <span>Sharpen</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('glitch')">
+                        <i class="fas fa-bolt"></i>
+                        <span>Glitch</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('neon')">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Neon</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('watercolor')">
+                        <i class="fas fa-palette"></i>
+                        <span>Watercolor</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('oil_painting')">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Oil Painting</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('sketch')">
+                        <i class="fas fa-pencil-alt"></i>
+                        <span>Sketch</span>
+                    </div>
+                    <div class="effect-card" onclick="applyFilter('cartoon')">
+                        <i class="fas fa-smile"></i>
+                        <span>Cartoon</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Effects Tab -->
+            <div id="effectsTab" class="tab-content" style="display: none;">
+                <div class="effect-grid">
+                    <div class="effect-card" onclick="applyEffect('vhs')">
+                        <i class="fas fa-tape"></i>
+                        <span>VHS</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('retro')">
+                        <i class="fas fa-history"></i>
+                        <span>Retro</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('glow')">
+                        <i class="fas fa-sun"></i>
+                        <span>Glow</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('pixelate')">
+                        <i class="fas fa-th"></i>
+                        <span>Pixelate</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('mosaic')">
+                        <i class="fas fa-border-all"></i>
+                        <span>Mosaic</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('emboss')">
+                        <i class="fas fa-stamp"></i>
+                        <span>Emboss</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('heatmap')">
+                        <i class="fas fa-fire"></i>
+                        <span>Heatmap</span>
+                    </div>
+                    <div class="effect-card" onclick="applyEffect('invert')">
+                        <i class="fas fa-adjust"></i>
+                        <span>Invert</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Adjust Tab -->
+            <div id="adjustTab" class="tab-content" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label text-white">
+                        <i class="fas fa-sun"></i> Brightness
+                    </label>
+                    <input type="range" class="range-slider" id="brightness" min="0" max="2" step="0.05" value="1" 
+                           oninput="adjustValue('brightness', this.value)">
+                    <span id="brightnessValue" class="value-display">1.00</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">
+                        <i class="fas fa-contrast"></i> Contrast
+                    </label>
+                    <input type="range" class="range-slider" id="contrast" min="0" max="2" step="0.05" value="1"
+                           oninput="adjustValue('contrast', this.value)">
+                    <span id="contrastValue" class="value-display">1.00</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">
+                        <i class="fas fa-palette"></i> Saturation
+                    </label>
+                    <input type="range" class="range-slider" id="saturation" min="0" max="2" step="0.05" value="1"
+                           oninput="adjustValue('saturation', this.value)">
+                    <span id="saturationValue" class="value-display">1.00</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white">
+                        <i class="fas fa-expand"></i> Sharpness
+                    </label>
+                    <input type="range" class="range-slider" id="sharpness" min="0" max="2" step="0.05" value="1"
+                           oninput="adjustValue('sharpness', this.value)">
+                    <span id="sharpnessValue" class="value-display">1.00</span>
+                </div>
+            </div>
+            
+            <!-- Tools Tab -->
+            <div id="toolsTab" class="tab-content" style="display: none;">
+                <button class="btn btn-custom w-100 mb-2" onclick="removeBackground()">
+                    <i class="fas fa-cut"></i> Remove Background (AI)
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="resizeImage()">
+                    <i class="fas fa-expand-arrows-alt"></i> Resize Image
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="rotateImage()">
+                    <i class="fas fa-undo-alt"></i> Rotate 90°
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="cropImage()">
+                    <i class="fas fa-crop"></i> Crop Image
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="flipImage('horizontal')">
+                    <i class="fas fa-arrows-alt-h"></i> Flip Horizontal
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="flipImage('vertical')">
+                    <i class="fas fa-arrows-alt-v"></i> Flip Vertical
+                </button>
+                <hr>
+                <button class="btn btn-custom w-100 mb-2" onclick="addText()">
+                    <i class="fas fa-font"></i> Add Text
+                </button>
+                <button class="btn btn-custom w-100 mb-2" onclick="showQualitySelector()">
+                    <i class="fas fa-chart-line"></i> Change Quality
+                </button>
+            </div>
+            
+            <!-- File Upload -->
+            <div class="mt-4">
+                <input type="file" id="fileInput" style="display: none" accept="image/*,video/*" onchange="uploadFile(this)">
+                <button class="btn btn-custom w-100" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-upload"></i> Upload File
+                </button>
+            </div>
+            
+            <!-- Reset Button -->
+            <div class="mt-2">
+                <button class="btn btn-outline-gold w-100" onclick="resetImage()">
+                    <i class="fas fa-undo-alt"></i> Reset to Original
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentSessionId = null;
+        let currentFileType = null;
+        let originalImageUrl = null;
+        let activeEffects = [];
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        // Switch tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.getElementById('filtersTab').style.display = 'none';
+            document.getElementById('effectsTab').style.display = 'none';
+            document.getElementById('adjustTab').style.display = 'none';
+            document.getElementById('toolsTab').style.display = 'none';
+            
+            document.getElementById(`${tab}Tab`).style.display = 'block';
+        }
+        
+        // Update adjustment values
+        function adjustValue(type, value) {
+            document.getElementById(`${type}Value`).innerText = parseFloat(value).toFixed(2);
+            adjust(type, value);
+        }
+        
+        // Upload file
+        async function uploadFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('user_id', 'anonymous');
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSessionId = data.session_id;
+                    currentFileType = data.file_type;
+                    
+                    if (data.file_type === 'image') {
+                        const img = document.getElementById('previewImage');
+                        img.src = data.preview_url;
+                        img.style.display = 'block';
+                        document.getElementById('previewVideo').style.display = 'none';
+                        originalImageUrl = data.preview_url;
+                    } else {
+                        const video = document.getElementById('previewVideo');
+                        video.src = data.preview_url;
+                        video.style.display = 'block';
+                        document.getElementById('previewImage').style.display = 'none';
+                    }
+                    
+                    document.querySelector('.upload-area').style.display = 'none';
+                    document.getElementById('qualitySelector').style.display = 'block';
+                    
+                    showNotification('File uploaded successfully!', 'success');
+                } else {
+                    showNotification(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showNotification('Upload failed. Please try again.', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Apply filter
+        async function applyFilter(filter) {
+            if (!currentSessionId) {
+                showNotification('Please upload a file first', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/apply_filter', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        filter: filter
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (currentFileType === 'image') {
+                        document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    }
+                    showNotification(`Applied ${filter} filter!`, 'success');
+                }
+            } catch (error) {
+                console.error('Filter error:', error);
+                showNotification('Failed to apply filter', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Apply effect
+        async function applyEffect(effect) {
+            if (!currentSessionId) {
+                showNotification('Please upload a file first', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/apply_filter', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        filter: effect
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (currentFileType === 'image') {
+                        document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    }
+                    showNotification(`Applied ${effect} effect!`, 'success');
+                }
+            } catch (error) {
+                console.error('Effect error:', error);
+                showNotification('Failed to apply effect', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Adjust image
+        async function adjust(type, value) {
+            if (!currentSessionId || currentFileType !== 'image') return;
+            
+            const endpoint = type === 'brightness' ? '/api/adjust_brightness' :
+                            type === 'contrast' ? '/api/adjust_contrast' :
+                            type === 'saturation' ? '/api/adjust_saturation' :
+                            '/api/adjust_sharpness';
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        factor: parseFloat(value)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                }
+            } catch (error) {
+                console.error('Adjust error:', error);
+            }
+        }
+        
+        // Remove background
+        async function removeBackground() {
+            if (!currentSessionId || currentFileType !== 'image') {
+                showNotification('Please upload an image first', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/remove_background', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({session_id: currentSessionId})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Background removed!', 'success');
+                }
+            } catch (error) {
+                console.error('Background removal error:', error);
+                showNotification('Failed to remove background', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Resize image
+        async function resizeImage() {
+            const width = prompt('Enter width (pixels):', '800');
+            const height = prompt('Enter height (pixels):', '600');
+            
+            if (!width || !height) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/resize', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        width: parseInt(width),
+                        height: parseInt(height)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Image resized!', 'success');
+                }
+            } catch (error) {
+                console.error('Resize error:', error);
+                showNotification('Failed to resize', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Rotate image
+        async function rotateImage() {
+            if (!currentSessionId) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/rotate', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        angle: 90
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Image rotated!', 'success');
+                }
+            } catch (error) {
+                console.error('Rotate error:', error);
+            }
+            
+            hideLoading();
+        }
+        
+        // Crop image
+        async function cropImage() {
+            const left = prompt('Left crop (pixels):', '0');
+            const top = prompt('Top crop (pixels):', '0');
+            const right = prompt('Right crop (pixels):', '500');
+            const bottom = prompt('Bottom crop (pixels):', '500');
+            
+            if (!left || !top || !right || !bottom) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/crop', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        left: parseInt(left),
+                        top: parseInt(top),
+                        right: parseInt(right),
+                        bottom: parseInt(bottom)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Image cropped!', 'success');
+                }
+            } catch (error) {
+                console.error('Crop error:', error);
+            }
+            
+            hideLoading();
+        }
+        
+        // Flip image
+        async function flipImage(direction) {
+            if (!currentSessionId) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/flip', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        direction: direction
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification(`Flipped ${direction}!`, 'success');
+                }
+            } catch (error) {
+                console.error('Flip error:', error);
+            }
+            
+            hideLoading();
+        }
+        
+        // Add text
+        async function addText() {
+            const text = prompt('Enter text:', 'Kinva Master');
+            if (!text) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/add_text', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        text: text,
+                        position: 'center',
+                        font_size: 40
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Text added!', 'success');
+                }
+            } catch (error) {
+                console.error('Add text error:', error);
+            }
+            
+            hideLoading();
+        }
+        
+        // Reset image
+        async function resetImage() {
+            if (!currentSessionId) return;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/reset', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({session_id: currentSessionId})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('previewImage').src = data.preview_url + '?t=' + Date.now();
+                    showNotification('Reset to original!', 'success');
+                }
+            } catch (error) {
+                console.error('Reset error:', error);
+            }
+            
+            hideLoading();
+        }
+        
+        // Show quality selector
+        function showQualitySelector() {
+            const qualities = ['144p', '240p', '360p', '480p', '720p', '1080p', '2K', '4K'];
+            const container = document.getElementById('qualityOptions');
+            container.innerHTML = '';
+            
+            qualities.forEach(quality => {
+                const badge = document.createElement('span');
+                badge.className = 'quality-badge';
+                badge.textContent = quality;
+                badge.onclick = () => setQuality(quality);
+                container.appendChild(badge);
+            });
+            
+            document.getElementById('qualitySelector').style.display = 'block';
+        }
+        
+        // Set export quality
+        async function setQuality(quality) {
+            showNotification(`Quality set to ${quality}`, 'success');
+            // Store quality for export
+            window.selectedQuality = quality;
+        }
+        
+        // Export file
+        async function exportFile() {
+            if (!currentSessionId) {
+                showNotification('No file to export', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const quality = window.selectedQuality || '1080p';
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        quality: quality
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `kinva_export_${Date.now()}.${currentFileType === 'image' ? 'jpg' : 'mp4'}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    showNotification('Export completed!', 'success');
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Export failed', 'error');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                showNotification('Export failed', 'error');
+            }
+            
+            hideLoading();
+        }
+        
+        // Open live stream
+        function openLiveStream() {
+            if (currentSessionId) {
+                window.open(`/stream?session=${currentSessionId}`, '_blank');
+            } else {
+                showNotification('Please upload a file first', 'error');
+            }
+        }
+        
+        // Loading indicators
+        function showLoading() {
+            const previewArea = document.querySelector('.preview-area');
+            const loader = document.createElement('div');
+            loader.className = 'loading-overlay';
+            loader.innerHTML = '<div class="spinner"></div>';
+            previewArea.style.position = 'relative';
+            previewArea.appendChild(loader);
+        }
+        
+        function hideLoading() {
+            const loader = document.querySelector('.loading-overlay');
+            if (loader) loader.remove();
+        }
+        
+        // Get user ID from URL or localStorage
+        function getUserId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('user') || localStorage.getItem('userId') || 'anonymous';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = getUserId();
+            localStorage.setItem('userId', userId);
+            console.log('User ID:', userId);
+        });
+    </script>
+</body>
+  </html>
