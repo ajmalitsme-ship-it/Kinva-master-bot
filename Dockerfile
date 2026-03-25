@@ -1,32 +1,47 @@
-FROM python:3.9-slim
+# Use official Python runtime as base image
+FROM python:3.11-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBIAN_FRONTEND=noninteractive \
+    OPENCV_IO_ENABLE_OPENEXR=1
+
+# Install minimal system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     libgomp1 \
-    libgl1-mesa-glx \
-    && rm -rf /var/lib/apt/lists/*
+    libglib2.0-0 \
+    libgl1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
-# Copy requirements first for better caching
+# Copy requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Python dependencies (without OpenCV first)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir numpy pillow python-telegram-bot Flask Flask-SocketIO pymongo redis python-dotenv requests moviepy
+
+# Create directories
+RUN mkdir -p temp uploads outputs logs static/css static/js templates fonts
 
 # Copy application
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p temp uploads outputs logs static/css static/js
+# Create user
+RUN useradd -m -u 1000 -s /bin/bash kinva && \
+    chown -R kinva:kinva /app
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
+USER kinva
 
-# Expose port
 EXPOSE 5000
 
-# Run the application
-CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "-b", "0.0.0.0:5000", "web_app:app"]
+CMD ["gunicorn", "--worker-class", "eventlet", "-w", "1", "--bind", "0.0.0.0:5000", "web_app:app"]
